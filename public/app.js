@@ -135,6 +135,7 @@ function matchIdeaToSettings() {
   }
   const idea = normalizeIdea(raw);
   const changes = [];
+  const warnings = [];
   const set = (id, value, label) => {
     const field = $(id);
     if (!field) return;
@@ -178,7 +179,7 @@ function matchIdeaToSettings() {
   } else if (/truj|jad|toksy|venom|poison/.test(idea)) {
     set("colorTheme", "emerald", "szmaragdowa paleta");
     set("iconStyle", "orb", "ikona kuli");
-    $("matchMessage").textContent = "Wykryto motyw trucizny. Bedrock nie ma tu bezpośredniego efektu trucizny w tym generatorze, więc wybierz efekt ręcznie zamiast podstawiać inny.";
+    warnings.push("Wykryto motyw trucizny. Ten generator nie dodaje bezpośredniego efektu trucizny, więc wybierz efekt ręcznie zamiast podstawiać inny.");
   } else if (/pustk|cien|mrok|kosmicz|void|relikt|runa/.test(idea)) {
     set("colorTheme", "void", "paleta pustki");
     set("iconStyle", "rune", "ikona runiczna");
@@ -221,7 +222,8 @@ function matchIdeaToSettings() {
   button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : $("type").value === "item_set" ? "Generuj zestaw 3 przedmiotów ↓" : "Generuj dodatek ↓";
   $("count").textContent = `${description.value.length} / 3000`;
   drawIconPreview();
-  $("matchMessage").textContent = `Dopasowano regułami: ${changes.length ? changes.join(", ") : "podstawowe ustawienia"}. Sprawdź pola i popraw je przed eksportem. To nie jest model AI.`;
+  const summary = `Dopasowano regułami: ${changes.length ? changes.join(", ") : "podstawowe ustawienia"}. Sprawdź pola i popraw je przed eksportem. To nie jest model AI.`;
+  $("matchMessage").textContent = warnings.length ? `${summary} Uwaga: ${warnings.join(" ")}` : summary;
   message.textContent = "";
 }
 
