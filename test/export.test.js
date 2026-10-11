@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.14");
+    assert.equal(status.version, "0.4.15");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
@@ -167,7 +167,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/export`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: "Blok ametystowy", type: "block", colorTheme: "void", blockHardness: 4.5, explosionResistance: 12, blockLight: 11, blockFriction: 0.15 })
+      body: JSON.stringify({ description: "Blok ametystowy", type: "block", colorTheme: "void", blockHardness: 4.5, explosionResistance: 12, blockLight: 11, blockFriction: 0.15, blockSound: "glass" })
     });
     const bytes = Buffer.from(await response.arrayBuffer());
     assert.equal(response.status, 200, bytes.toString("utf8").slice(0, 300));
@@ -180,6 +180,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const bp = readZipEntries(bpEntry[1]);
     assert.ok(rp.has("textures/terrain_texture.json"), "Brakuje atlasu tekstur bloków.");
     assert.ok(rp.has("blocks.json"), "Brakuje mapowania tekstury bloku.");
+    assert.equal(JSON.parse(rp.get("blocks.json").toString("utf8"))["studio:blok_ametystowy"].sound, "glass", "Wybrany dźwięk bloku nie został zapisany.");
     assert.ok([...rp.keys()].some(name => name.startsWith("textures/blocks/") && name.endsWith(".png")), "Brakuje tekstury PNG bloku.");
     const blockPath = [...bp.keys()].find(name => name.startsWith("blocks/") && name.endsWith(".json"));
     assert.ok(blockPath, "Behavior Pack nie zawiera definicji bloku.");
