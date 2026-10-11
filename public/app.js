@@ -16,7 +16,7 @@ button.addEventListener("click", async () => {
     description.focus();
     return;
   }
-  const damage = Number($("damage").value), stackSize = Number($("stackSize").value), durability = Number($("durability").value), blockHardness = Number($("blockHardness").value), explosionResistance = Number($("explosionResistance").value), blockLight = Number($("blockLight").value), blockFriction = Number($("blockFriction").value), blockSound = $("blockSound").value;
+  const damage = Number($("damage").value), stackSize = Number($("stackSize").value), durability = Number($("durability").value), blockHardness = Number($("blockHardness").value), explosionResistance = Number($("explosionResistance").value), blockLight = Number($("blockLight").value), blockFriction = Number($("blockFriction").value), blockSound = $("blockSound").value, blockTextureStyle = $("blockTextureStyle").value;
   if (!Number.isInteger(damage) || damage < 1 || damage > 20) { message.textContent = "Obrażenia muszą być liczbą całkowitą od 1 do 20."; $("damage").focus(); return; }
   if (!Number.isInteger(stackSize) || stackSize < 1 || stackSize > 64) { message.textContent = "Wielkość stosu musi być liczbą całkowitą od 1 do 64."; $("stackSize").focus(); return; }
   if (!Number.isInteger(durability) || durability < 0 || durability > 1000) { message.textContent = "Trwałość musi być liczbą całkowitą od 0 do 1000."; $("durability").focus(); return; }
@@ -31,7 +31,7 @@ button.addEventListener("click", async () => {
     const response = await fetch("/api/export", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: value, type: $("type").value, damage: Number($("damage").value), stackSize: Number($("stackSize").value), durability: Number($("durability").value), rarity: $("rarity").value, glint: $("glint").checked, recipeMaterial: $("recipeMaterial").value, recipeCount: Number($("recipeCount").value), iconStyle: $("iconStyle").value, colorTheme: $("colorTheme").value, blockHardness: Number($("blockHardness").value), explosionResistance: Number($("explosionResistance").value), blockLight: Number($("blockLight").value), blockFriction: Number($("blockFriction").value), blockSound })
+      body: JSON.stringify({ description: value, type: $("type").value, damage: Number($("damage").value), stackSize: Number($("stackSize").value), durability: Number($("durability").value), rarity: $("rarity").value, glint: $("glint").checked, recipeMaterial: $("recipeMaterial").value, recipeCount: Number($("recipeCount").value), iconStyle: $("iconStyle").value, colorTheme: $("colorTheme").value, blockHardness: Number($("blockHardness").value), explosionResistance: Number($("explosionResistance").value), blockLight: Number($("blockLight").value), blockFriction: Number($("blockFriction").value), blockSound, blockTextureStyle })
     });
     if (!response.ok) {
       let error = {};
