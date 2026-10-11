@@ -1,4 +1,4 @@
-# AI Addon Studio 0.4.0
+# AI Addon Studio 0.4.1
 
 Lokalny prototyp narzędzia do tworzenia paczek Minecraft Bedrock.
 
@@ -14,7 +14,7 @@ Następnie otwórz http://localhost:3000.
 
 ## Funkcje
 
-- Eksport prototypu dodatku przedmiotowego jako `.mcaddon`, z Behavior Pack i Resource Pack.
+- Eksport prototypu dodatku przedmiotowego jako `.mcaddon`, który zawiera pliki `.mcpack` dla Behavior Pack i Resource Pack.
 - Eksport paczki zasobów jako `.mcpack`.
 - Osobne manifesty i zależność Behavior Pack od Resource Pack.
 - Generowana tekstura PNG w stylu pixel-art.
