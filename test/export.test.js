@@ -65,6 +65,25 @@ function readZipEntries(buffer) {
   return entries;
 }
 
+function validatePackJsonAndManifest(entries, label) {
+  for (const [name, bytes] of entries) {
+    if (!name.endsWith(".json")) continue;
+    try {
+      JSON.parse(bytes.toString("utf8"));
+    } catch (error) {
+      assert.fail(label + ": nieprawidłowy JSON w " + name + ": " + error.message);
+    }
+  }
+  const manifest = JSON.parse(entries.get("manifest.json").toString("utf8"));
+  assert.equal(manifest.format_version, 2, label + ": nieobsługiwana wersja manifestu.");
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  assert.match(manifest.header.uuid, uuidPattern, label + ": nieprawidłowy UUID nagłówka.");
+  const uuids = [manifest.header.uuid, ...manifest.modules.map(module => module.uuid)];
+  assert.equal(new Set(uuids).size, uuids.length, label + ": UUID nagłówka i modułów muszą być unikalne.");
+  for (const uuid of uuids.slice(1)) assert.match(uuid, uuidPattern, label + ": nieprawidłowy UUID modułu.");
+  return manifest;
+}
+
 test("AI Addon Studio smoke tests", async (t) => {
   server = spawn(process.execPath, ["server.js"], {
     env: { ...process.env, PORT: String(port) },
@@ -147,6 +166,10 @@ test("AI Addon Studio smoke tests", async (t) => {
 
     const rp = readZipEntries(rpEntry[1]);
     const bp = readZipEntries(bpEntry[1]);
+    const rpManifest = validatePackJsonAndManifest(rp, "Resource Pack");
+    const bpManifest = validatePackJsonAndManifest(bp, "Behavior Pack");
+    assert.notEqual(rpManifest.header.uuid, bpManifest.header.uuid, "Resource Pack i Behavior Pack muszą mieć różne UUID.");
+    assert.ok(bpManifest.dependencies.some(dependency => dependency.uuid === rpManifest.header.uuid && JSON.stringify(dependency.version) === JSON.stringify(rpManifest.header.version)), "Zależność Behavior Pack musi wskazywać dokładny UUID i wersję Resource Pack.");
     assert.ok(rp.has("manifest.json"), "Resource Pack nie ma manifest.json.");
     assert.ok(rp.has("textures/item_texture.json"), "Resource Pack nie ma atlasu tekstur.");
     const geometryPath = [...rp.keys()].find(name => /^models\/entity\/.+\.geo\.json$/.test(name));
