@@ -15,7 +15,10 @@ button.addEventListener("click", async () => {
     description.focus();
     return;
   }
-  const damage = Number($("damage").value), stackSize = Number($("stackSize").value);\n  if (!Number.isInteger(damage) || damage < 1 || damage > 20) { message.textContent = "Obrażenia muszą być liczbą całkowitą od 1 do 20."; $("damage").focus(); return; }\n  if (!Number.isInteger(stackSize) || stackSize < 1 || stackSize > 64) { message.textContent = "Wielkość stosu musi być liczbą całkowitą od 1 do 64."; $("stackSize").focus(); return; }\n  button.disabled = true;
+  const damage = Number($("damage").value), stackSize = Number($("stackSize").value);
+  if (!Number.isInteger(damage) || damage < 1 || damage > 20) { message.textContent = "Obrażenia muszą być liczbą całkowitą od 1 do 20."; $("damage").focus(); return; }
+  if (!Number.isInteger(stackSize) || stackSize < 1 || stackSize > 64) { message.textContent = "Wielkość stosu musi być liczbą całkowitą od 1 do 64."; $("stackSize").focus(); return; }
+  button.disabled = true;
   button.textContent = "Tworzę paczkę…";
   message.textContent = "Generuję pliki Minecraft Bedrock…";
   try {
