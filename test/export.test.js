@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.19");
+    assert.equal(status.version, "0.4.20");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
@@ -152,6 +152,19 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.notDeepEqual(crystal, orb, "Styl kuli powinien dawać inną teksturę niż kryształ.");
     assert.notDeepEqual(orb, rune, "Styl runiczny powinien różnić się od magicznej kuli.");
   });
+  await t.test("shaped recipe uses a pattern and selected ingredients", async () => {
+    const response = await fetch(`${baseUrl}/api/export`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: "Miecz z receptura ukladu", type: "item", recipeMaterial: "minecraft:diamond", recipeTool: "minecraft:blaze_rod", recipeType: "shaped" }) });
+    assert.equal(response.status, 200);
+    const addon = readZipEntries(Buffer.from(await response.arrayBuffer()));
+    const bpEntry = [...addon.entries()].find(([name]) => name.endsWith("-BP.mcpack"));
+    const bp = readZipEntries(bpEntry[1]);
+    const recipePath = [...bp.keys()].find(name => name.startsWith("recipes/") && name.endsWith(".json"));
+    const recipe = JSON.parse(bp.get(recipePath).toString("utf8"))["minecraft:recipe_shaped"];
+    assert.deepEqual(recipe.pattern, ["AB"]);
+    assert.equal(recipe.key.A.item, "minecraft:diamond");
+    assert.equal(recipe.key.B.item, "minecraft:blaze_rod");
+  });
+
   await t.test("second recipe ingredient is configurable and unsupported values fall back safely", async () => {
     async function getRecipe(recipeTool) {
       const response = await fetch(`${baseUrl}/api/export`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: "Test drugiego skladnika", type: "item", recipeTool }) });
