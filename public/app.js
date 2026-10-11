@@ -177,6 +177,7 @@ function matchIdeaToSettings() {
     set("colorTheme", "ice", "lodowa paleta");
     set("iconStyle", "crystal", "ikona kryształu");
   } else if (/truj|jad|toksy|venom|poison/.test(idea)) {
+    set("itemEffect", "none", "brak automatycznie przypisanego efektu trucizny");
     set("colorTheme", "emerald", "szmaragdowa paleta");
     set("iconStyle", "orb", "ikona kuli");
     warnings.push("Wykryto motyw trucizny. Ten generator nie dodaje bezpośredniego efektu trucizny, więc wybierz efekt ręcznie zamiast podstawiać inny.");
