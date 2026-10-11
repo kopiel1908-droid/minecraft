@@ -285,6 +285,80 @@ button.addEventListener("click", async () => {
     button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : $("type").value === "item_set" ? "Generuj zestaw 3 przedmiotów ↓" : "Generuj dodatek ↓";
   }
 });
+function readProjectConfig() {
+  return {
+    format: "ai-addon-studio-config",
+    version: 1,
+    savedAt: new Date().toISOString(),
+    fields: Object.fromEntries(
+      [...document.querySelectorAll("input[id], select[id], textarea[id]")]
+        .filter(field => field.id !== "loadConfigFile")
+        .map(field => [field.id, field.type === "checkbox" ? field.checked : field.value])
+    )
+  };
+}
+
+$("saveConfig")?.addEventListener("click", () => {
+  const config = readProjectConfig();
+  const blob = new Blob([JSON.stringify(config, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "ai-addon-studio-config.json";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  $("configMessage").textContent = "Zapisano ustawienia formularza do pliku JSON.";
+});
+
+$("loadConfigButton")?.addEventListener("click", () => $("loadConfigFile")?.click());
+
+$("loadConfigFile")?.addEventListener("change", async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const output = $("configMessage");
+  try {
+    if (file.size > 1024 * 1024) throw new Error("Plik jest za duży (maksymalnie 1 MB).");
+    const config = JSON.parse(await file.text());
+    if (config?.format !== "ai-addon-studio-config" || config.version !== 1 || !config.fields || typeof config.fields !== "object") {
+      throw new Error("To nie jest obsługiwany plik konfiguracji AI Addon Studio.");
+    }
+    let loaded = 0;
+    for (const [id, value] of Object.entries(config.fields)) {
+      const field = $(id);
+      if (!field || id === "loadConfigFile" || !["INPUT", "SELECT", "TEXTAREA"].includes(field.tagName)) continue;
+      if (field.type === "checkbox") {
+        if (typeof value !== "boolean") continue;
+        field.checked = value;
+      } else if (field.tagName === "SELECT") {
+        if (![...field.options].some(option => option.value === String(value))) continue;
+        field.value = String(value);
+      } else if (field.type === "number") {
+        const number = Number(value);
+        if (value === "" || !Number.isFinite(number)) continue;
+        if (field.min !== "" && number < Number(field.min)) continue;
+        if (field.max !== "" && number > Number(field.max)) continue;
+        field.value = String(value);
+      } else {
+        if (typeof value !== "string" || (field.maxLength >= 0 && value.length > field.maxLength)) continue;
+        field.value = value;
+      }
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+      field.dispatchEvent(new Event("change", { bubbles: true }));
+      loaded++;
+    }
+    $("blockSettings").hidden = $("type").value !== "block";
+    $("export").textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : $("type").value === "item_set" ? "Generuj zestaw 3 przedmiotów ↓" : "Generuj dodatek ↓";
+    drawIconPreview();
+    output.textContent = `Wczytano ${loaded} ustawień. Sprawdź formularz przed eksportem.`;
+  } catch (error) {
+    output.textContent = error.message || "Nie udało się wczytać konfiguracji.";
+  } finally {
+    event.target.value = "";
+  }
+});
+
 async function checkStatus() {
   try {
     const response = await fetch("/api/status");
