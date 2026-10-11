@@ -134,8 +134,8 @@ async function buildExport(description,type,options={}){
     await zipDirectory(path.join(root,"resource_pack"),rpFile);
     await zipDirectory(path.join(root,"behavior_pack"),bpFile);
     const container=path.join(root,"addon_container");fs.mkdirSync(container);
-    fs.cpSync(path.join(root,"resource_pack"),path.join(container,`${packName} RP`),{recursive:true});
-    fs.cpSync(path.join(root,"behavior_pack"),path.join(container,`${packName} BP`),{recursive:true});
+    fs.copyFileSync(rpFile,path.join(container,`${packName}-RP.mcpack`));
+    fs.copyFileSync(bpFile,path.join(container,`${packName}-BP.mcpack`));
     const output=path.join(os.tmpdir(),`${packName}-${randomUUID()}.mcaddon`);
     await zipDirectory(container,output);temporary.push(output);
     return {output,filename:`${packName}.mcaddon`,contentType:"application/octet-stream",cleanup:()=>{fs.rmSync(root,{recursive:true,force:true});for(const f of temporary)fs.rmSync(f,{force:true});}};
@@ -154,7 +154,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.0",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.1",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -177,4 +177,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.0 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.1 działa: http://localhost:${port}`));
