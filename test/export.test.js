@@ -361,10 +361,10 @@ test("AI Addon Studio smoke tests", async (t) => {
   await t.test("rule-based prompt matching uses valid keyword patterns", async () => {
     const { readFile } = await import("node:fs/promises");
     const js = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
-    assert.match(js, /\\\\b\\(ruda\\|blok/);
-    assert.match(js, /set\\("colorTheme", "fire"/);
-    assert.match(js, /set\\("itemEffect", "regeneration"/);
-    assert.doesNotMatch(js, /\\\\\\\\b\\(ruda\\|blok/);
+    assert.ok(js.includes("/\\b(ruda|blok|kamien|cegla|mur|podloze|klocek)\\b/"));
+    assert.ok(js.includes('set("colorTheme", "fire"'));
+    assert.ok(js.includes('set("itemEffect", "regeneration"'));
+    assert.ok(!js.includes("/\\\\b(ruda|blok"));
   });
 
   await t.test("UI exposes explicit rule-based prompt matching without auto-export", async () => {
