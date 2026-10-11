@@ -1,4 +1,4 @@
-# AI Addon Studio 0.4.28
+# AI Addon Studio 0.4.29
 
 Lokalny prototyp narzędzia do tworzenia paczek Minecraft Bedrock.
 
@@ -18,7 +18,7 @@ Następnie otwórz http://localhost:3000.
 - Eksport paczki zasobów jako `.mcpack`.
 - Tryb zestawu: generuje trzy przedmioty tematyczne (odłamek, rdzeń i relikt), każdy z własną ikoną, parametrami, recepturą i manifestami, zebrane w jednym pliku `.mcaddon`.
 - Osobne manifesty i zależność Behavior Pack od Resource Pack.
-- Cztery style tekstury PNG pixel-art: miecz, kryształ, magiczna kula i runiczny talizman; pięć palet kolorów: lodowy błękit, ogień, szmaragd, pustka i złoto.
+- Cztery style tekstury PNG pixel-art: miecz, kryształ, magiczna kula i runiczny talizman; pięć palet kolorów: lodowy błękit, ogień, szmaragd, pustka i złoto. Interfejs pokazuje podgląd ikony na żywo przy zmianie stylu i koloru.
 - Eksperymentalne modele geometrii Bedrock dla czterech stylów przedmiotów, wraz z plikami attachable i mapowaniem UV na sześciu ścianach brył. Testy sprawdzają strukturę geometrii i referencje tekstur, ale wyświetlanie modelu w grze nadal wymaga testu w Minecraft Bedrock; nie jest to jeszcze pełny edytor modeli 3D.
 - Efekt po użyciu: szybkość, siła, skok, regeneracja, widzenie w ciemności lub odporność; czas 1–120 sekund i poziom I–V. Przedmiot z efektem otrzymuje komponenty konsumpcji Bedrock.
 - Opcjonalna blokada ponownego użycia przedmiotu (cooldown) od 1 do 60 sekund; 0 wyłącza blokadę. Wymaga testu zgodności w grze.
