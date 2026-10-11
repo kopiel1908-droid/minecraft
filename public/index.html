@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0d10">
-  <title>AI Addon Studio 0.4.28</title>
+  <title>AI Addon Studio 0.4.29</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
       <span class="status"><span class="dot"></span> lokalnie</span>
     </header>
     <section class="hero">
-      <span class="tag">WERSJA 0.4.28</span>
+      <span class="tag">WERSJA 0.4.29</span>
       <h2>Twój pomysł.<br><em>Twój dodatek.</em></h2>
       <p>Generator tworzy paczki zasobów, przedmioty z efektami po użyciu i eksperymentalne bloki do Minecraft Bedrock. Tryb zestawu przygotowuje trzy warianty przedmiotu w jednym pliku .mcaddon. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
     </section>
@@ -103,6 +103,15 @@
         <option value="void">Fiolet pustki</option>
         <option value="gold">Złoto</option>
       </select>
+      <section class="preview-card" aria-labelledby="previewTitle">
+        <div class="preview-art"><canvas id="iconPreview" width="16" height="16" role="img" aria-label="Podgląd tekstury przedmiotu"></canvas></div>
+        <div class="preview-copy">
+          <p class="eyebrow">PODGLĄD NA ŻYWO</p>
+          <h3 id="previewTitle">Ikona przedmiotu</h3>
+          <p id="previewLabel">Miecz pixel-art • Lodowy błękit</p>
+          <p class="hint">Podgląd aktualizuje się przy zmianie stylu lub koloru. To tekstura 2D, nie podgląd modelu 3D.</p>
+        </div>
+      </section>
       <label for="recipeMaterial">Składnik receptury craftingu</label>
       <select id="recipeMaterial">
         <option value="minecraft:iron_ingot">Sztabka żelaza + patyk</option>
@@ -139,7 +148,7 @@
     </section>
     <section class="panel details">
       <p class="eyebrow">02 / CO JEST GOTOWE</p>
-      <h3>Generator 0.4.28</h3>
+      <h3>Generator 0.4.29</h3>
       <ul>
         <li>Tworzy osobne manifesty Behavior Pack i Resource Pack.</li>
         <li>Dodaje definicję przedmiotu, wybieraną teksturę PNG pixel-art z paletą kolorów, obrażenia, trwałość, rzadkość, magiczny połysk i wielkość stosu i liczbę sztuk z receptury craftingu.</li>
