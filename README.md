@@ -1,4 +1,4 @@
-# AI Addon Studio 0.4.30
+# AI Addon Studio 0.4.31
 
 Lokalny prototyp narzędzia do tworzenia paczek Minecraft Bedrock.
 
@@ -13,6 +13,8 @@ npm start
 Następnie otwórz http://localhost:3000.
 
 ## Funkcje
+
+- Dopasowanie ustawień do opisu przez jawne reguły słów kluczowych: typ projektu, paleta, styl ikony, obrażenia, trwałość, efekty, rzadkość i wybrane składniki craftingu. Przycisk tylko uzupełnia formularz, niczego sam nie eksportuje; dopasowanie nie korzysta jeszcze z modelu AI.
 
 - Szybkie szablony startowe: kryształowy miecz, eliksir regeneracji, epicki relikt i świecąca ruda. Szablon ustawia parametry formularza, które można potem dowolnie zmienić.
 - Eksport prototypu dodatku przedmiotowego jako `.mcaddon`, który zawiera pliki `.mcpack` dla Behavior Pack i Resource Pack.
