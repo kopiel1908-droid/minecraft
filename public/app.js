@@ -31,7 +31,7 @@ button.addEventListener("click", async () => {
     const response = await fetch("/api/export", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: value, type: $("type").value, damage: Number($("damage").value), stackSize: Number($("stackSize").value), durability: Number($("durability").value), rarity: $("rarity").value, glint: $("glint").checked, recipeMaterial: $("recipeMaterial").value, recipeCount: Number($("recipeCount").value), iconStyle: $("iconStyle").value, colorTheme: $("colorTheme").value, blockHardness: Number($("blockHardness").value), explosionResistance: Number($("explosionResistance").value), blockLight: Number($("blockLight").value), blockFriction: Number($("blockFriction").value), blockSound, blockTextureStyle })
+      body: JSON.stringify({ description: value, type: $("type").value, damage: Number($("damage").value), stackSize: Number($("stackSize").value), durability: Number($("durability").value), rarity: $("rarity").value, glint: $("glint").checked, recipeMaterial: $("recipeMaterial").value, recipeTool: $("recipeTool").value, recipeCount: Number($("recipeCount").value), iconStyle: $("iconStyle").value, colorTheme: $("colorTheme").value, blockHardness: Number($("blockHardness").value), explosionResistance: Number($("explosionResistance").value), blockLight: Number($("blockLight").value), blockFriction: Number($("blockFriction").value), blockSound, blockTextureStyle })
     });
     if (!response.ok) {
       let error = {};
