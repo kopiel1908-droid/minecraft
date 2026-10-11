@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.33");
+    assert.equal(status.version, "0.4.34");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("item_set"));
@@ -98,6 +98,8 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.match(script, /ai-addon-studio-config/);
     assert.match(script, /function readProjectConfig\(\)/);
     assert.match(script, /Plik jest za duży/);
+    assert.match(script, /warnings\.length \? `\$\{summary\} Uwaga:/);
+    assert.match(script, /brak automatycznie przypisanego efektu trucizny/);
   });
 
   await t.test("mcaddon contains valid resource and behavior pack files", async () => {
