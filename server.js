@@ -238,7 +238,16 @@ function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,opt
         "minecraft:damage":options.damage??7,
         "minecraft:rarity":{value:options.rarity??"common"},
         "minecraft:glint":options.glint===true,
-        ...(options.durability > 0 ? {"minecraft:durability":{max_durability:options.durability}} : {})
+        ...(options.durability > 0 ? {"minecraft:durability":{max_durability:options.durability}} : {}),
+        ...(options.itemEffect && options.itemEffect!=="none" ? {
+          "minecraft:food":{
+            nutrition:0,
+            saturation_modifier:"poor",
+            can_always_eat:true,
+            effects:[{name:options.itemEffect, chance:1.0, duration:options.effectDuration??10, amplifier:options.effectAmplifier??0}]
+          },
+          "minecraft:use_modifiers":{use_duration:1.6,movement_modifier:0.35}
+        } : {})
       }
     }
   });
@@ -334,7 +343,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.22",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.23",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -379,7 +388,12 @@ const server=http.createServer(async(req,res)=>{
       const requestedBlockTextureStyle=String(body.blockTextureStyle||"crystal");
       const blockTextureStyle=allowedBlockTextureStyles.has(requestedBlockTextureStyle)?requestedBlockTextureStyle:"crystal";
       const glint=body.glint===true;
-      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeTool,recipeType,recipeCount,durability,rarity,glint,itemCategory,handEquipped,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound,blockTextureStyle});
+      const allowedItemEffects=new Set(["none","speed","strength","jump_boost","regeneration","night_vision","resistance"]);
+      const requestedItemEffect=String(body.itemEffect||"none");
+      const itemEffect=allowedItemEffects.has(requestedItemEffect)?requestedItemEffect:"none";
+      const effectDuration=Math.max(1,Math.min(120,Math.round(Number(body.effectDuration)||10)));
+      const effectAmplifier=Math.max(0,Math.min(4,Math.round(Number(body.effectAmplifier)||0)));
+      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeTool,recipeType,recipeCount,durability,rarity,glint,itemCategory,handEquipped,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound,blockTextureStyle,itemEffect,effectDuration,effectAmplifier});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
@@ -392,4 +406,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.22 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.23 działa: http://localhost:${port}`));
