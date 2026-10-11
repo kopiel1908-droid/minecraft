@@ -90,7 +90,7 @@ function createResourcePack(root,packName,itemId,itemName,description,packUuid){
   });
   return rp;
 }
-function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid){
+function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,options={}){
   const bp=path.join(root,"behavior_pack"),packUuid=randomUUID();
   writeJson(path.join(bp,"manifest.json"),{
     format_version:2,
@@ -105,9 +105,9 @@ function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid){
       components:{
         "minecraft:icon":{texture:itemId},
         "minecraft:display_name":{value:itemName},
-        "minecraft:max_stack_size":1,
+        "minecraft:max_stack_size":options.stackSize??1,
         "minecraft:hand_equipped":true,
-        "minecraft:damage":7
+        "minecraft:damage":options.damage??7
       }
     }
   });
@@ -115,7 +115,7 @@ function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid){
   fs.writeFileSync(path.join(bp,"texts","README.txt"),`Pomysł: ${description}\nPrzedmiot: studio:${itemId}\n\nWłącz Behavior Pack i Resource Pack w ustawieniach świata.\n`);
   return bp;
 }
-async function buildExport(description,type){
+async function buildExport(description,type,options={}){
   const itemName=displayName(description),itemId=safeName(itemName).slice(0,28)||"custom_item";
   const packName=safeName(itemName),root=path.join(os.tmpdir(),`ai-addon-${randomUUID()}`);
   fs.mkdirSync(root,{recursive:true});
@@ -129,7 +129,7 @@ async function buildExport(description,type){
     }
     const rpUuid=randomUUID();
     createResourcePack(root,packName,itemId,itemName,description,rpUuid);
-    createBehaviorPack(root,packName,itemId,itemName,description,rpUuid);
+    createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,options);
     const rpFile=path.join(root,`${packName}-RP.mcpack`),bpFile=path.join(root,`${packName}-BP.mcpack`);
     await zipDirectory(path.join(root,"resource_pack"),rpFile);
     await zipDirectory(path.join(root,"behavior_pack"),bpFile);
@@ -162,7 +162,9 @@ const server=http.createServer(async(req,res)=>{
       if(description.length<5)return send(res,400,{error:"Wpisz opis (minimum 5 znaków)."});
       if(description.length>3000)return send(res,400,{error:"Opis może mieć maksymalnie 3000 znaków."});
       if(!new Set(["resource_pack","item","universal"]).has(type))return send(res,400,{error:"Ten rodzaj dodatku jest jeszcze w przygotowaniu. Działają przedmioty i paczki zasobów."});
-      result=await buildExport(description,type);
+      const damage=Math.max(1,Math.min(20,Math.round(Number(body.damage)||7)));
+      const stackSize=Math.max(1,Math.min(64,Math.round(Number(body.stackSize)||1)));
+      result=await buildExport(description,type,{damage,stackSize});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
