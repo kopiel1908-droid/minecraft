@@ -81,8 +81,13 @@ function createResourcePack(root,packName,itemId,itemName,description,packUuid){
   fs.writeFileSync(path.join(rp,"texts","languages.json"),JSON.stringify(["en_US","pl_PL"],null,2)+"\n");
   fs.writeFileSync(path.join(rp,"texts","en_US.lang"),`item.${itemId}.name=${itemName}\npack.name=${packName} RP\npack.description=Generated with AI Addon Studio\n`);
   fs.writeFileSync(path.join(rp,"texts","pl_PL.lang"),`item.${itemId}.name=${itemName}\npack.name=${packName} RP\npack.description=Zasoby wygenerowane przez AI Addon Studio\n`);
-  fs.mkdirSync(path.join(rp,"textures","items"),{recursive:true});
-  fs.writeFileSync(path.join(rp,"textures","items",`${itemId}.png`),makeIcon(itemId));
+  const itemTexturesDir=path.join(rp,"textures","items");
+  const itemTextureFile=path.join(itemTexturesDir,`${itemId}.png`);
+  const iconBytes=makeIcon(itemId);
+  // Twórz katalog bezpośrednio przed zapisem, żeby uniknąć ENOENT na Windows.
+  fs.mkdirSync(itemTexturesDir,{recursive:true});
+  fs.writeFileSync(itemTextureFile,iconBytes);
+  if(!fs.existsSync(itemTextureFile))throw new Error(`Nie udało się utworzyć tekstury przedmiotu: ${itemTextureFile}`);
   writeJson(path.join(rp,"textures","item_texture.json"),{
     resource_pack_name:packName,
     texture_name:"atlas.items",
