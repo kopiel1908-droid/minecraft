@@ -121,6 +121,44 @@ function makeIcon(seed,style="sword",colorTheme="ice"){
   const header=Buffer.alloc(13);header.writeUInt32BE(width,0);header.writeUInt32BE(height,4);header[8]=8;header[9]=6;
   return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),pngChunk("IHDR",header),pngChunk("IDAT",zlib.deflateSync(raw)),pngChunk("IEND",Buffer.alloc(0))]);
 }
+function makeBlockTexture(seed,style="crystal",colorTheme="ice"){
+  const width=16,height=16,pixels=Buffer.alloc(width*height*4);
+  const palettes={ice:[70,175,235],fire:[235,82,45],emerald:[45,190,115],void:[160,90,230],gold:[235,185,55]};
+  const ore=palettes[colorTheme]||palettes.ice;
+  const set=(x,y,color)=>{if(x<0||x>=width||y<0||y>=height)return;const i=(y*width+x)*4;pixels[i]=color[0];pixels[i+1]=color[1];pixels[i+2]=color[2];pixels[i+3]=255;};
+  const hash=[...seed].reduce((v,ch)=>(v*31+ch.charCodeAt(0))>>>0,0);
+  const stone=[75+(hash%25),80+(hash%20),88+(hash%18)];
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++)set(x,y,stone);
+  if(style==="bricks"){
+    for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+      const offset=Math.floor(y/4)%2?4:0;
+      set(x,y,y%4===0||(x+offset)%8===0?[24,30,38]:[stone[0]+18,stone[1]+18,stone[2]+18]);
+    }
+  } else if(style==="ore"){
+    for(let y=1;y<15;y++)for(let x=1;x<15;x++){
+      const v=(x*17+y*29+hash)%19;
+      if(v<4)set(x,y,[Math.max(0,ore[0]-35),Math.max(0,ore[1]-35),Math.max(0,ore[2]-35)]);
+      if(v===4||v===5)set(x,y,ore);
+    }
+    set(4,4,[235,240,245]);set(11,10,[235,240,245]);
+  } else if(style==="metal"){
+    for(let y=2;y<14;y++)for(let x=2;x<14;x++)set(x,y,[stone[0]+38,stone[1]+38,stone[2]+38]);
+    for(let i=3;i<13;i++){set(i,3,[210,220,230]);set(i,12,[35,42,50]);}
+    for(const [x,y] of [[3,3],[12,3],[3,12],[12,12]])set(x,y,[225,190,100]);
+  } else {
+    for(let y=2;y<14;y++)for(let x=2;x<14;x++){
+      const edge=x===2||x===13||y===2||y===13;
+      set(x,y,edge?[Math.max(0,ore[0]-45),Math.max(0,ore[1]-45),Math.max(0,ore[2]-45)]:ore);
+    }
+    for(let i=4;i<9;i++)set(i,4,[235,245,255]);
+    for(let i=5;i<8;i++)set(4,i,[235,245,255]);
+    set(11,11,[Math.max(0,ore[0]-60),Math.max(0,ore[1]-60),Math.max(0,ore[2]-60)]);
+  }
+  const raw=Buffer.alloc(height*(1+width*4));
+  for(let y=0;y<height;y++){raw[y*(1+width*4)]=0;pixels.copy(raw,y*(1+width*4)+1,y*width*4,(y+1)*width*4);}
+  const header=Buffer.alloc(13);header.writeUInt32BE(width,0);header.writeUInt32BE(height,4);header[8]=8;header[9]=6;
+  return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),pngChunk("IHDR",header),pngChunk("IDAT",zlib.deflateSync(raw)),pngChunk("IEND",Buffer.alloc(0))]);
+}
 function writeJson(file,value){fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,JSON.stringify(value,null,2)+"\n","utf8");}
 function createResourcePack(root,packName,itemId,itemName,description,packUuid,iconStyle="sword",colorTheme="ice"){
   const rp=path.join(root,"resource_pack");
@@ -148,7 +186,7 @@ function createResourcePack(root,packName,itemId,itemName,description,packUuid,i
   });
   return rp;
 }
-function createBlockResourcePack(root,packName,blockId,blockName,description,packUuid,colorTheme="ice",blockSound="stone"){
+function createBlockResourcePack(root,packName,blockId,blockName,description,packUuid,colorTheme="ice",blockSound="stone",blockTextureStyle="crystal"){
   const rp=path.join(root,"resource_pack");
   writeJson(path.join(rp,"manifest.json"),{format_version:2,header:{name:packName+" Block RP",description:"Tekstury bloku wygenerowane przez AI Addon Studio",uuid:packUuid,version:[1,0,0],min_engine_version:[1,20,80]},modules:[{type:"resources",uuid:randomUUID(),version:[1,0,0]}]});
   fs.mkdirSync(path.join(rp,"texts"),{recursive:true});
@@ -156,7 +194,7 @@ function createBlockResourcePack(root,packName,blockId,blockName,description,pac
   fs.writeFileSync(path.join(rp,"texts","en_US.lang"),"tile.studio:"+blockId+".name="+blockName+"\npack.name="+packName+" Block RP\npack.description=Generated with AI Addon Studio\n");
   fs.writeFileSync(path.join(rp,"texts","pl_PL.lang"),"tile.studio:"+blockId+".name="+blockName+"\npack.name="+packName+" Block RP\npack.description=Tekstura bloku wygenerowana przez AI Addon Studio\n");
   const blockDir=path.join(rp,"textures","blocks"); fs.mkdirSync(blockDir,{recursive:true});
-  fs.writeFileSync(path.join(blockDir,blockId+".png"),makeIcon(blockId,"crystal",colorTheme));
+  fs.writeFileSync(path.join(blockDir,blockId+".png"),makeBlockTexture(blockId,blockTextureStyle,colorTheme));
   writeJson(path.join(rp,"textures","terrain_texture.json"),{resource_pack_name:packName,texture_name:"atlas.terrain",padding:8,num_mip_levels:4,texture_data:{[blockId]:{textures:"textures/blocks/"+blockId}}});
   writeJson(path.join(rp,"blocks.json"),{["studio:"+blockId]:{textures:blockId,sound:blockSound}});
   return rp;
@@ -215,7 +253,7 @@ async function buildExport(description,type,options={}){
     const blockId=itemId.slice(0,24)||"custom_block",packName=safeName(itemName),root=path.join(os.tmpdir(),"ai-addon-"+randomUUID());
     fs.mkdirSync(root,{recursive:true}); const temporary=[];
     try{
-      const rpUuid=randomUUID(); createBlockResourcePack(root,packName,blockId,itemName,description,rpUuid,options.colorTheme,options.blockSound); createBlockBehaviorPack(root,packName,blockId,itemName,description,rpUuid,options);
+      const rpUuid=randomUUID(); createBlockResourcePack(root,packName,blockId,itemName,description,rpUuid,options.colorTheme,options.blockSound,options.blockTextureStyle); createBlockBehaviorPack(root,packName,blockId,itemName,description,rpUuid,options);
       const rpFile=path.join(root,packName+"-RP.mcpack"),bpFile=path.join(root,packName+"-BP.mcpack");
       await zipDirectory(path.join(root,"resource_pack"),rpFile); await zipDirectory(path.join(root,"behavior_pack"),bpFile);
       const container=path.join(root,"addon_container"); fs.mkdirSync(container); fs.copyFileSync(rpFile,path.join(container,packName+"-RP.mcpack")); fs.copyFileSync(bpFile,path.join(container,packName+"-BP.mcpack"));
@@ -260,7 +298,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.16",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.17",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -292,8 +330,11 @@ const server=http.createServer(async(req,res)=>{
       const allowedBlockSounds=new Set(["stone","wood","glass","grass","metal"]);
       const requestedBlockSound=String(body.blockSound||"stone");
       const blockSound=allowedBlockSounds.has(requestedBlockSound)?requestedBlockSound:"stone";
+      const allowedBlockTextureStyles=new Set(["crystal","bricks","ore","metal"]);
+      const requestedBlockTextureStyle=String(body.blockTextureStyle||"crystal");
+      const blockTextureStyle=allowedBlockTextureStyles.has(requestedBlockTextureStyle)?requestedBlockTextureStyle:"crystal";
       const glint=body.glint===true;
-      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeCount,durability,rarity,glint,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound});
+      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeCount,durability,rarity,glint,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound,blockTextureStyle});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
