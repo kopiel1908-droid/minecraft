@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0d10">
-  <title>AI Addon Studio 0.4.20</title>
+  <title>AI Addon Studio 0.4.21</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
       <span class="status"><span class="dot"></span> lokalnie</span>
     </header>
     <section class="hero">
-      <span class="tag">WERSJA 0.4.20</span>
+      <span class="tag">WERSJA 0.4.21</span>
       <h2>Twój pomysł.<br><em>Twój dodatek.</em></h2>
       <p>Generator tworzy paczkę zasobów, prototyp przedmiotu albo eksperymentalny blok do Minecraft Bedrock. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
     </section>
@@ -38,6 +38,15 @@
         <div><label for="damage">Obrażenia przedmiotu</label><input id="damage" type="number" min="1" max="20" value="7"><p class="hint">Dla broni: 1–20</p></div>
         <div><label for="stackSize">Maks. liczba w stosie</label><input id="stackSize" type="number" min="1" max="64" value="1"><p class="hint">Od 1 do 64 sztuk</p></div>
       </div>
+      <label for="itemCategory">Kategoria przedmiotu w ekwipunku</label>
+      <select id="itemCategory">
+        <option value="equipment">Wyposażenie</option>
+        <option value="nature">Natura</option>
+        <option value="construction">Budowanie</option>
+        <option value="items">Przedmioty</option>
+      </select>
+      <label class="check-row" for="handEquipped"><input id="handEquipped" type="checkbox" checked> Trzymaj przedmiot jak broń / narzędzie</label>
+      <p class="hint">Odznacz dla przedmiotów, które nie powinny być wyświetlane w dłoni jak miecz.</p>
       <label class="check-row" for="glint"><input id="glint" type="checkbox"> Efekt magicznego połysku</label>
       <p class="hint">Dodaje wizualny połysk przedmiotowi, jeśli obsługuje go docelowa wersja Bedrock.</p>
       <label for="rarity">Rzadkość przedmiotu</label>
@@ -103,7 +112,7 @@
     </section>
     <section class="panel details">
       <p class="eyebrow">02 / CO JEST GOTOWE</p>
-      <h3>Generator 0.4.20</h3>
+      <h3>Generator 0.4.21</h3>
       <ul>
         <li>Tworzy osobne manifesty Behavior Pack i Resource Pack.</li>
         <li>Dodaje definicję przedmiotu, wybieraną teksturę PNG pixel-art z paletą kolorów, obrażenia, trwałość, rzadkość, magiczny połysk i wielkość stosu i liczbę sztuk z receptury craftingu.</li>
