@@ -103,6 +103,9 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.ok(rp.has("manifest.json"), "Resource Pack nie ma manifest.json.");
     assert.ok(rp.has("textures/item_texture.json"), "Resource Pack nie ma atlasu tekstur.");
     assert.ok([...rp.keys()].some(name => /^textures\/items\/.+\.png$/.test(name)), "Resource Pack nie ma tekstury PNG.");
+    const textureName = [...rp.keys()].find(name => /^textures\\/items\\/.+\\.png$/.test(name));
+    const png = rp.get(textureName);
+    assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], "Tekstura nie ma prawidłowego nagłówka PNG.");
     assert.ok(bp.has("manifest.json"), "Behavior Pack nie ma manifest.json.");
     assert.ok([...bp.keys()].some(name => /^items\/.+\.json$/.test(name)), "Behavior Pack nie ma definicji przedmiotu.");
     const recipeName = [...bp.keys()].find(name => /^recipes\/.+\.json$/.test(name));
