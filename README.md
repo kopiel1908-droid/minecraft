@@ -1,4 +1,4 @@
-# AI Addon Studio 0.4.31
+# AI Addon Studio 0.4.32
 
 Lokalny prototyp narzędzia do tworzenia paczek Minecraft Bedrock.
 
