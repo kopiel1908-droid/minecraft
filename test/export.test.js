@@ -83,7 +83,8 @@ test("AI Addon Studio smoke tests", async (t) => {
         type: "item",
         damage: 7,
         stackSize: 1,
-        recipeMaterial: "minecraft:diamond",\n        iconStyle: "crystal"
+        recipeMaterial: "minecraft:diamond",
+        iconStyle: "crystal"
       })
     });
 
