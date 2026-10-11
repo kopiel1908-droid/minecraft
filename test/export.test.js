@@ -68,9 +68,10 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.21");
+    assert.equal(status.version, "0.4.22");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
+    assert.ok(status.supportedTypes.includes("item_set"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
     assert.ok(status.supportedTypes.includes("block"));
   });
@@ -266,6 +267,32 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.notDeepEqual(crystal, bricks, "Wzór cegieł powinien różnić się od kryształu.");
     assert.notDeepEqual(bricks, ore, "Wzór rudy powinien różnić się od cegieł.");
     assert.notDeepEqual(ore, metal, "Metal powinien różnić się od rudy.");
+  });
+
+  await t.test("item set exports three items with six pack files", async () => {
+    const response = await fetch(`${baseUrl}/api/export`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description: "Relikt burzy", type: "item_set", colorTheme: "emerald" })
+    });
+    const bytes = Buffer.from(await response.arrayBuffer());
+    assert.equal(response.status, 200, bytes.toString("utf8").slice(0, 300));
+    assert.match(response.headers.get("content-disposition") || "", /zestaw-3-przedmiotow\.mcaddon/i);
+    const addon = readZipEntries(bytes);
+    const packs = [...addon.keys()].filter(name => name.endsWith(".mcpack"));
+    assert.equal(packs.length, 6, "Zestaw powinien zawierać trzy pary Resource Pack i Behavior Pack.");
+    assert.equal(packs.filter(name => name.endsWith("-RP.mcpack")).length, 3);
+    assert.equal(packs.filter(name => name.endsWith("-BP.mcpack")).length, 3);
+    const itemIds = [];
+    for (const name of packs.filter(name => name.endsWith("-BP.mcpack"))) {
+      const bp = readZipEntries(addon.get(name));
+      const itemPath = [...bp.keys()].find(entry => entry.startsWith("items/") && entry.endsWith(".json"));
+      assert.ok(itemPath, "Każdy Behavior Pack zestawu powinien zawierać przedmiot.");
+      const item = JSON.parse(bp.get(itemPath).toString("utf8"))["minecraft:item"];
+      itemIds.push(item.description.identifier);
+      assert.ok([...bp.keys()].some(entry => entry.startsWith("recipes/") && entry.endsWith(".json")));
+    }
+    assert.equal(new Set(itemIds).size, 3, "Wszystkie trzy przedmioty muszą mieć różne identyfikatory.");
   });
 
   await t.test("rejects descriptions that are too short and unsupported project types", async () => {
