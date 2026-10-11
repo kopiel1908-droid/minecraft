@@ -238,6 +238,7 @@ function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,opt
         "minecraft:damage":options.damage??7,
         "minecraft:rarity":{value:options.rarity??"common"},
         "minecraft:glint":options.glint===true,
+        ...(options.useAnimation && options.useAnimation!=="default" ? {"minecraft:use_animation":options.useAnimation} : {}),
         ...(options.enchantability > 0 ? {"minecraft:enchantable":{value:options.enchantability,slot:options.enchantSlot||"sword"}} : {}),
         ...(options.cooldownSeconds > 0 ? {"minecraft:cooldown":{category:`studio:${itemId}`,duration:options.cooldownSeconds}} : {}),
         ...(options.durability > 0 ? {"minecraft:durability":{max_durability:options.durability}} : {}),
@@ -345,7 +346,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.25",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.26",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -400,7 +401,10 @@ const server=http.createServer(async(req,res)=>{
       const allowedEnchantSlots=new Set(["sword","bow","crossbow","armor_head","armor_torso","armor_legs","armor_feet","elytra","gathering","fishing_rod","shears","flintsteel","trident","mace","all"]);
       const requestedEnchantSlot=String(body.enchantSlot||"sword");
       const enchantSlot=allowedEnchantSlots.has(requestedEnchantSlot)?requestedEnchantSlot:"sword";
-      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeTool,recipeType,recipeCount,durability,rarity,glint,itemCategory,handEquipped,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound,blockTextureStyle,itemEffect,effectDuration,effectAmplifier,cooldownSeconds,enchantability,enchantSlot});
+      const allowedUseAnimations=new Set(["default","eat","drink","bow","crossbow","spear","spyglass","brush","camera"]);
+      const requestedUseAnimation=String(body.useAnimation||"default");
+      const useAnimation=allowedUseAnimations.has(requestedUseAnimation)?requestedUseAnimation:"default";
+      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeTool,recipeType,recipeCount,durability,rarity,glint,itemCategory,handEquipped,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound,blockTextureStyle,itemEffect,effectDuration,effectAmplifier,cooldownSeconds,enchantability,enchantSlot,useAnimation});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
@@ -413,4 +417,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.25 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.26 działa: http://localhost:${port}`));
