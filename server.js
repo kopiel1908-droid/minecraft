@@ -323,7 +323,7 @@ const server=http.createServer(async(req,res)=>{
       const allowedItemCategories=new Set(["equipment","nature","construction","items"]);
       const requestedItemCategory=String(body.itemCategory||"equipment");
       const itemCategory=allowedItemCategories.has(requestedItemCategory)?requestedItemCategory:"equipment";
-      const handEquipped=body.handEquipped===true;
+      const handEquipped=body.handEquipped!==false;
       const requestedRecipeType=String(body.recipeType||"shapeless");
       const recipeType=requestedRecipeType==="shaped"?"shaped":"shapeless";
       const allowedRecipeTools=new Set(["minecraft:stick","minecraft:blaze_rod","minecraft:bone","minecraft:amethyst_shard"]);
