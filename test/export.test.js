@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.15");
+    assert.equal(status.version, "0.4.16");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
@@ -86,6 +86,7 @@ test("AI Addon Studio smoke tests", async (t) => {
         stackSize: 1,
         durability: 321,
         rarity: "epic",
+        glint: true,
         recipeMaterial: "minecraft:diamond",
         iconStyle: "crystal",
         colorTheme: "fire"
@@ -117,6 +118,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const item = JSON.parse(bp.get(itemPath).toString("utf8"))["minecraft:item"];
     assert.equal(item.components["minecraft:durability"].max_durability, 321, "Ustawiona trwałość nie została zapisana w definicji przedmiotu.");
     assert.equal(item.components["minecraft:rarity"].value, "epic", "Wybrana rzadkość nie została zapisana w definicji przedmiotu.");
+    assert.equal(item.components["minecraft:glint"], true, "Efekt magicznego połysku nie został zapisany.");
     const recipeName = [...bp.keys()].find(name => /^recipes\/.+\.json$/.test(name));
     assert.ok(recipeName, "Behavior Pack nie ma receptury craftingu.");
     const recipe = JSON.parse(bp.get(recipeName).toString("utf8"));
@@ -221,6 +223,7 @@ test("AI Addon Studio smoke tests", async (t) => {
         damage: 999,
         stackSize: 999,
         durability: 99999,
+        glint: "yes",
         blockLight: 99,
         recipeCount: 99,
         rarity: "mythic",
