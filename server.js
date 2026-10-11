@@ -111,6 +111,15 @@ function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,opt
       }
     }
   });
+  writeJson(path.join(bp,"recipes",`${itemId}.json`),{
+    format_version:"1.20.10",
+    "minecraft:recipe_shapeless":{
+      description:{identifier:`studio:craft_${itemId}`},
+      tags:["crafting_table"],
+      ingredients:[{item:"minecraft:iron_ingot"},{item:"minecraft:stick"}],
+      result:{item:`studio:${itemId}`,count:1}
+    }
+  });
   fs.mkdirSync(path.join(bp,"texts"),{recursive:true});
   fs.writeFileSync(path.join(bp,"texts","README.txt"),`Pomysł: ${description}\nPrzedmiot: studio:${itemId}\n\nWłącz Behavior Pack i Resource Pack w ustawieniach świata.\n`);
   return bp;
