@@ -14,6 +14,7 @@ Następnie otwórz http://localhost:3000.
 
 ## Funkcje
 
+- Zapis i odczyt konfiguracji formularza w pliku JSON. Import sprawdza format i zakresy wartości, pomija niepasujące pola, a konfigurację można dalej edytować przed eksportem dodatku. Plik konfiguracyjny nie zawiera gotowego `.mcaddon`.
 - Dopasowanie ustawień do opisu przez jawne reguły słów kluczowych: typ projektu, paleta, styl ikony, obrażenia, trwałość, efekty, rzadkość i wybrane składniki craftingu. Przycisk tylko uzupełnia formularz, niczego sam nie eksportuje; dopasowanie nie korzysta jeszcze z modelu AI.
 
 - Szybkie szablony startowe: kryształowy miecz, eliksir regeneracji, epicki relikt i świecąca ruda. Szablon ustawia parametry formularza, które można potem dowolnie zmienić.
