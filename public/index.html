@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0d10">
-  <title>AI Addon Studio 0.4.25</title>
+  <title>AI Addon Studio 0.4.26</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
       <span class="status"><span class="dot"></span> lokalnie</span>
     </header>
     <section class="hero">
-      <span class="tag">WERSJA 0.4.25</span>
+      <span class="tag">WERSJA 0.4.26</span>
       <h2>Twój pomysł.<br><em>Twój dodatek.</em></h2>
       <p>Generator tworzy paczki zasobów, przedmioty z efektami po użyciu i eksperymentalne bloki do Minecraft Bedrock. Tryb zestawu przygotowuje trzy warianty przedmiotu w jednym pliku .mcaddon. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
     </section>
@@ -84,6 +84,9 @@
       <p class="hint">Od 1 do 30. Określa wartość komponentu zaklinania przedmiotu.</p>
       <label for="enchantSlot">Typ zaklinania</label>
       <select id="enchantSlot"><option value="sword">Miecz</option><option value="bow">Łuk</option><option value="crossbow">Kusza</option><option value="armor_head">Hełm</option><option value="armor_torso">Napierśnik</option><option value="armor_legs">Nogawice</option><option value="armor_feet">Buty</option><option value="gathering">Narzędzia</option><option value="fishing_rod">Wędka</option><option value="trident">Trójząb</option><option value="mace">Buława</option><option value="all">Wszystkie kompatybilne</option></select>
+      <label for="useAnimation">Animacja używania przedmiotu</label>
+      <select id="useAnimation"><option value="default">Domyślna</option><option value="eat">Jedzenie</option><option value="drink">Picie</option><option value="bow">Łuk</option><option value="crossbow">Kusza</option><option value="spear">Włócznia</option><option value="spyglass">Luneta</option><option value="brush">Szczotka</option><option value="camera">Aparat</option></select>
+      <p class="hint">Ustawia animację używania przedmiotu. Niektóre animacje są przeznaczone dla konkretnych typów przedmiotów i wymagają testu w Bedrock.</p>
       <label for="iconStyle">Styl ikony przedmiotu</label>
       <select id="iconStyle">
         <option value="sword">Miecz pixel-art</option>
@@ -136,7 +139,7 @@
     </section>
     <section class="panel details">
       <p class="eyebrow">02 / CO JEST GOTOWE</p>
-      <h3>Generator 0.4.25</h3>
+      <h3>Generator 0.4.26</h3>
       <ul>
         <li>Tworzy osobne manifesty Behavior Pack i Resource Pack.</li>
         <li>Dodaje definicję przedmiotu, wybieraną teksturę PNG pixel-art z paletą kolorów, obrażenia, trwałość, rzadkość, magiczny połysk i wielkość stosu i liczbę sztuk z receptury craftingu.</li>
