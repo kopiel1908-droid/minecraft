@@ -94,7 +94,12 @@ function makeIcon(seed,style="sword",colorTheme="ice"){
   const base=palettes[colorTheme]||palettes.ice;
   const set=(x,y,color)=>{if(x<0||x>=width||y<0||y>=height)return;const i=(y*width+x)*4;pixels[i]=color[0];pixels[i+1]=color[1];pixels[i+2]=color[2];pixels[i+3]=255;};
   for(let y=0;y<height;y++)for(let x=0;x<width;x++)set(x,y,[22,29,37]);
-  if(style==="crystal"){
+  if(style==="rune"){
+    for(let i=3;i<=12;i++){set(8,i,[base[0],base[1],base[2]]);set(i,8,[base[0],base[1],base[2]]);}
+    for(const [x,y] of [[8,3],[7,4],[9,4],[6,5],[10,5],[5,6],[11,6],[4,8],[12,8],[5,10],[11,10],[6,11],[10,11],[7,12],[9,12]])set(x,y,[base[0],base[1],base[2]]);
+    set(7,7,[245,250,255]);set(8,7,[245,250,255]);set(7,8,[245,250,255]);set(8,8,[245,250,255]);
+    set(7,13,[240,196,100]);set(8,13,[240,196,100]);set(7,14,[240,196,100]);set(8,14,[240,196,100]);
+  } else if(style==="crystal"){
     for(let y=3;y<=12;y++){
       const half=Math.floor((y<=7?y-2:13-y)/2);
       for(let x=8-half;x<=8+half;x++)set(x,y,[base[0],base[1],base[2]]);
@@ -298,7 +303,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.17",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.18",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -317,7 +322,7 @@ const server=http.createServer(async(req,res)=>{
       const requestedMaterial=String(body.recipeMaterial||"minecraft:iron_ingot");
       const recipeMaterial=allowedRecipeMaterials.has(requestedMaterial)?requestedMaterial:"minecraft:iron_ingot";
       const requestedIconStyle=String(body.iconStyle||"sword");
-      const iconStyle=new Set(["sword","crystal","orb"]).has(requestedIconStyle)?requestedIconStyle:"sword";
+      const iconStyle=new Set(["sword","crystal","orb","rune"]).has(requestedIconStyle)?requestedIconStyle:"sword";
       const requestedColorTheme=String(body.colorTheme||"ice");
       const colorTheme=new Set(["ice","fire","emerald","void","gold"]).has(requestedColorTheme)?requestedColorTheme:"ice";
       const blockHardness=Math.max(0.1,Math.min(10,Number(body.blockHardness)||1.5));
