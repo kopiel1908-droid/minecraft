@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.29");
+    assert.equal(status.version, "0.4.30");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("item_set"));
@@ -82,6 +82,10 @@ test("AI Addon Studio smoke tests", async (t) => {
     const page = await pageResponse.text();
     assert.match(page, /id="iconPreview"/);
     assert.match(page, /id="previewLabel"/);
+    assert.match(page, /data-preset="weapon"/);
+    assert.match(page, /data-preset="potion"/);
+    assert.match(page, /data-preset="relic"/);
+    assert.match(page, /data-preset="block"/);
     const scriptResponse = await fetch(`${baseUrl}/app.js`);
     assert.equal(scriptResponse.status, 200);
     const script = await scriptResponse.text();
