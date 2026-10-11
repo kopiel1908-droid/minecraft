@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.16");
+    assert.equal(status.version, "0.4.17");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
@@ -193,6 +193,32 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.equal(block.components["minecraft:destructible_by_explosion"].explosion_resistance, 12);
     assert.equal(block.components["minecraft:light_emission"], 11, "Emisja światła bloku nie została zapisana.");
     assert.equal(block.components["minecraft:friction"], 0.15, "Tarcie powierzchni bloku nie zostało zapisane.");
+  });
+
+
+  await t.test("block texture styles generate different PNG patterns", async () => {
+    async function exportBlockTexture(blockTextureStyle) {
+      const response = await fetch(`${baseUrl}/api/export`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: "Tekstura bloku testowego", type: "block", blockTextureStyle })
+      });
+      assert.equal(response.status, 200);
+      const addon = readZipEntries(Buffer.from(await response.arrayBuffer()));
+      const rpEntry = [...addon.entries()].find(([name]) => name.endsWith("-RP.mcpack"));
+      assert.ok(rpEntry, "Brakuje Resource Pack.");
+      const rp = readZipEntries(rpEntry[1]);
+      const texturePath = [...rp.keys()].find(name => name.startsWith("textures/blocks/") && name.endsWith(".png"));
+      assert.ok(texturePath, "Brakuje tekstury PNG bloku.");
+      return rp.get(texturePath);
+    }
+    const crystal = await exportBlockTexture("crystal");
+    const bricks = await exportBlockTexture("bricks");
+    const ore = await exportBlockTexture("ore");
+    const metal = await exportBlockTexture("metal");
+    assert.notDeepEqual(crystal, bricks, "Wzór cegieł powinien różnić się od kryształu.");
+    assert.notDeepEqual(bricks, ore, "Wzór rudy powinien różnić się od cegieł.");
+    assert.notDeepEqual(ore, metal, "Metal powinien różnić się od rudy.");
   });
 
   await t.test("rejects descriptions that are too short and unsupported project types", async () => {
