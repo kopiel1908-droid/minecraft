@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.7");
+    assert.equal(status.version, "0.4.8");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
@@ -114,6 +114,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.ok(recipeName, "Behavior Pack nie ma receptury craftingu.");
     const recipe = JSON.parse(bp.get(recipeName).toString("utf8"));
     assert.ok(recipe["minecraft:recipe_shapeless"].ingredients.some(item => item.item === "minecraft:diamond"), "Wybrany składnik receptury nie został zapisany.");
+    assert.equal(recipe["minecraft:recipe_shapeless"].result.count, 1, "Domyślna liczba sztuk z receptury powinna wynosić 1.");
   });
   await t.test("icon style and palette change the generated texture", async () => {
     async function exportTexture(iconStyle, colorTheme) {
@@ -138,6 +139,20 @@ test("AI Addon Studio smoke tests", async (t) => {
     const orb = await exportTexture("orb", "void");
     assert.notDeepEqual(sword, crystal, "Styl kryształu powinien dawać inną teksturę niż miecz.");
     assert.notDeepEqual(crystal, orb, "Styl kuli powinien dawać inną teksturę niż kryształ.");
+  });
+  await t.test("recipe output count is configurable and bounded", async () => {
+    const response = await fetch(`${baseUrl}/api/export`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description: "Receptura z trzema sztukami", type: "item", recipeCount: 3 })
+    });
+    assert.equal(response.status, 200);
+    const addon = readZipEntries(Buffer.from(await response.arrayBuffer()));
+    const bpFile = [...addon.values()].find(value => value.length > 0 && value.subarray(0, 4).toString("hex") === "504b0304" && readZipEntries(value).has("manifest.json") && [...readZipEntries(value).keys()].some(name => /^recipes\\/.+\\.json$/.test(name)));
+    assert.ok(bpFile, "Nie znaleziono Behavior Pack z recepturą.");
+    const bp = readZipEntries(bpFile);
+    const recipePath = [...bp.keys()].find(name => /^recipes\\/.+\\.json$/.test(name));
+    assert.equal(JSON.parse(bp.get(recipePath).toString("utf8"))["minecraft:recipe_shapeless"].result.count, 3);
   });
 
 });
