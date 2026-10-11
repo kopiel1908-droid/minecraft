@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.27");
+    assert.equal(status.version, "0.4.28");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("item_set"));
@@ -109,8 +109,31 @@ test("AI Addon Studio smoke tests", async (t) => {
     const bp = readZipEntries(bpEntry[1]);
     assert.ok(rp.has("manifest.json"), "Resource Pack nie ma manifest.json.");
     assert.ok(rp.has("textures/item_texture.json"), "Resource Pack nie ma atlasu tekstur.");
-    assert.ok([...rp.keys()].some(name => /^models\/entity\/.+\.geo\.json$/.test(name)), "Resource Pack nie ma geometrii modelu.");
-    assert.ok([...rp.keys()].some(name => /^attachables\/.+\.json$/.test(name)), "Resource Pack nie ma definicji attachable.");
+    const geometryPath = [...rp.keys()].find(name => /^models\/entity\/.+\.geo\.json$/.test(name));
+    assert.ok(geometryPath, "Resource Pack nie ma geometrii modelu.");
+    const geometry = JSON.parse(rp.get(geometryPath).toString("utf8"));
+    assert.equal(geometry.format_version, "1.16.0");
+    const bones = geometry["minecraft:geometry"][0].bones;
+    assert.ok(bones.length > 0, "Geometria musi zawierać kość.");
+    assert.ok(bones.some(bone => (bone.cubes || []).length > 0), "Geometria musi zawierać bryły.");
+    for (const bone of bones) {
+      for (const cube of bone.cubes || []) {
+        assert.equal(cube.origin.length, 3);
+        assert.equal(cube.size.length, 3);
+        assert.ok(cube.uv && typeof cube.uv === "object", "Każda bryła musi mieć mapowanie UV Bedrock.");
+        for (const face of ["north", "east", "south", "west", "up", "down"]) {
+          assert.deepEqual(cube.uv[face].uv, [0, 0]);
+          assert.deepEqual(cube.uv[face].uv_size, [16, 16]);
+        }
+        assert.ok(!JSON.stringify(cube).includes("#layer0"), "Geometria Bedrock nie powinna używać referencji tekstur Java.");
+      }
+    }
+    const attachablePath = [...rp.keys()].find(name => /^attachables\/.+\.json$/.test(name));
+    assert.ok(attachablePath, "Resource Pack nie ma definicji attachable.");
+    const attachable = JSON.parse(rp.get(attachablePath).toString("utf8"))["minecraft:attachable"];
+    assert.ok(attachable.description.identifier.startsWith("studio:"));
+    assert.ok(attachable.description.geometry.default.startsWith("geometry."));
+    assert.ok(attachable.description.textures.default.startsWith("textures/items/"));
     assert.ok([...rp.keys()].some(name => /^textures\/items\/.+\.png$/.test(name)), "Resource Pack nie ma tekstury PNG.");
     const textureName = [...rp.keys()].find(name => /^textures\/items\/.+\.png$/.test(name));
     const png = rp.get(textureName);
