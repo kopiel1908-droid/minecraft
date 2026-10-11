@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.20");
+    assert.equal(status.version, "0.4.21");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
@@ -119,6 +119,8 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.equal(item.components["minecraft:durability"].max_durability, 321, "Ustawiona trwałość nie została zapisana w definicji przedmiotu.");
     assert.equal(item.components["minecraft:rarity"].value, "epic", "Wybrana rzadkość nie została zapisana w definicji przedmiotu.");
     assert.equal(item.components["minecraft:glint"], true, "Efekt magicznego połysku nie został zapisany.");
+    assert.equal(item.description.menu_category.category, "equipment", "Domyślna kategoria przedmiotu powinna być wyposażeniem.");
+    assert.equal(item.components["minecraft:hand_equipped"], true, "Domyślnie przedmiot powinien być trzymany jak narzędzie.");
     const recipeName = [...bp.keys()].find(name => /^recipes\/.+\.json$/.test(name));
     assert.ok(recipeName, "Behavior Pack nie ma receptury craftingu.");
     const recipe = JSON.parse(bp.get(recipeName).toString("utf8"));
@@ -152,6 +154,18 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.notDeepEqual(crystal, orb, "Styl kuli powinien dawać inną teksturę niż kryształ.");
     assert.notDeepEqual(orb, rune, "Styl runiczny powinien różnić się od magicznej kuli.");
   });
+  await t.test("item category and hand display are configurable", async () => {
+    const response = await fetch(`${baseUrl}/api/export`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: "Kula mikstur testowa", type: "item", itemCategory: "nature", handEquipped: false }) });
+    assert.equal(response.status, 200);
+    const addon = readZipEntries(Buffer.from(await response.arrayBuffer()));
+    const bpEntry = [...addon.entries()].find(([name]) => name.endsWith("-BP.mcpack"));
+    const bp = readZipEntries(bpEntry[1]);
+    const itemPath = [...bp.keys()].find(name => name.startsWith("items/") && name.endsWith(".json"));
+    const item = JSON.parse(bp.get(itemPath).toString("utf8"))["minecraft:item"];
+    assert.equal(item.description.menu_category.category, "nature");
+    assert.equal(item.components["minecraft:hand_equipped"], false);
+  });
+
   await t.test("shaped recipe uses a pattern and selected ingredients", async () => {
     const response = await fetch(`${baseUrl}/api/export`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: "Miecz z receptura ukladu", type: "item", recipeMaterial: "minecraft:diamond", recipeTool: "minecraft:blaze_rod", recipeType: "shaped" }) });
     assert.equal(response.status, 200);
