@@ -364,7 +364,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.33",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.34",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
