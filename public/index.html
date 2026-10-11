@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0d10">
-  <title>AI Addon Studio 0.4.4</title>
+  <title>AI Addon Studio 0.4.5</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
       <span class="status"><span class="dot"></span> lokalnie</span>
     </header>
     <section class="hero">
-      <span class="tag">WERSJA 0.4.4</span>
+      <span class="tag">WERSJA 0.4.5</span>
       <h2>Twój pomysł.<br><em>Twój dodatek.</em></h2>
       <p>Generator tworzy paczkę zasobów lub prototyp dodatku z własnym przedmiotem do Minecraft Bedrock. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
     </section>
@@ -38,6 +38,13 @@
         <div><label for="damage">Obrażenia przedmiotu</label><input id="damage" type="number" min="1" max="20" value="7"><p class="hint">Dla broni: 1–20</p></div>
         <div><label for="stackSize">Maks. liczba w stosie</label><input id="stackSize" type="number" min="1" max="64" value="1"><p class="hint">Od 1 do 64 sztuk</p></div>
       </div>
+      <label for="iconStyle">Styl ikony przedmiotu</label>
+      <select id="iconStyle">
+        <option value="sword">Miecz pixel-art</option>
+        <option value="crystal">Kryształ</option>
+        <option value="orb">Magiczna kula</option>
+      </select>
+      <p class="hint">To prosta tekstura 2D. Nie zmienia modelu ani zachowania przedmiotu.</p>
       <label for="recipeMaterial">Składnik receptury craftingu</label>
       <select id="recipeMaterial">
         <option value="minecraft:iron_ingot">Sztabka żelaza + patyk</option>
@@ -53,12 +60,12 @@
     </section>
     <section class="panel details">
       <p class="eyebrow">02 / CO JEST GOTOWE</p>
-      <h3>Generator 0.4.4</h3>
+      <h3>Generator 0.4.5</h3>
       <ul>
         <li>Tworzy osobne manifesty Behavior Pack i Resource Pack.</li>
-        <li>Dodaje definicję przedmiotu, teksturę PNG pixel-art oraz ustawiane obrażenia i wielkość stosu.</li>
+        <li>Dodaje definicję przedmiotu, wybieraną teksturę PNG pixel-art, obrażenia i wielkość stosu.</li>
         <li>Eksportuje paczkę .mcaddon lub .mcpack.</li>
-        <li>Mobów, bloków, pojazdów i map jeszcze nie generuje.</li>
+        <li>Do wyboru są trzy style ikony: miecz, kryształ i magiczna kula. Mobów, bloków, pojazdów i map jeszcze nie generuje.</li>
       </ul>
     </section>
     <footer>AI Addon Studio • Minecraft Bedrock • wersja eksperymentalna</footer>
