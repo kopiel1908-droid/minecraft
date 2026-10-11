@@ -148,10 +148,10 @@ test("AI Addon Studio smoke tests", async (t) => {
     });
     assert.equal(response.status, 200);
     const addon = readZipEntries(Buffer.from(await response.arrayBuffer()));
-    const bpFile = [...addon.values()].find(value => value.length > 0 && value.subarray(0, 4).toString("hex") === "504b0304" && readZipEntries(value).has("manifest.json") && [...readZipEntries(value).keys()].some(name => /^recipes\\/.+\\.json$/.test(name)));
-    assert.ok(bpFile, "Nie znaleziono Behavior Pack z recepturą.");
-    const bp = readZipEntries(bpFile);
-    const recipePath = [...bp.keys()].find(name => /^recipes\\/.+\\.json$/.test(name));
+    const bpEntry = [...addon.entries()].find(([name]) => name.endsWith("-BP.mcpack"));
+    assert.ok(bpEntry, "Nie znaleziono pliku Behavior Pack.");
+    const bp = readZipEntries(bpEntry[1]);
+    const recipePath = [...bp.keys()].find(name => name.startsWith("recipes/") && name.endsWith(".json"));
     assert.equal(JSON.parse(bp.get(recipePath).toString("utf8"))["minecraft:recipe_shapeless"].result.count, 3);
   });
 
