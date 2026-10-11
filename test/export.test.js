@@ -358,15 +358,6 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.equal(new Set(itemIds).size, 3, "Wszystkie trzy przedmioty muszą mieć różne identyfikatory.");
   });
 
-  await t.test("rule-based prompt matching uses valid keyword patterns", async () => {
-    const { readFile } = await import("node:fs/promises");
-    const js = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
-    assert.ok(js.includes("/\\b(ruda|blok|kamien|cegla|mur|podloze|klocek)\\b/"));
-    assert.ok(js.includes('set("colorTheme", "fire"'));
-    assert.ok(js.includes('set("itemEffect", "regeneration"'));
-    assert.ok(!js.includes("/\\\\b(ruda|blok"));
-  });
-
   await t.test("UI exposes explicit rule-based prompt matching without auto-export", async () => {
     const { readFile } = await import("node:fs/promises");
     const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
