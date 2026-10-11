@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.5");
+    assert.equal(status.version, "0.4.6");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
@@ -84,7 +84,8 @@ test("AI Addon Studio smoke tests", async (t) => {
         damage: 7,
         stackSize: 1,
         recipeMaterial: "minecraft:diamond",
-        iconStyle: "crystal"
+        iconStyle: "crystal",
+        colorTheme: "fire"
       })
     });
 
