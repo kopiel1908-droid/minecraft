@@ -82,7 +82,8 @@ test("AI Addon Studio smoke tests", async (t) => {
         description: "Miecz slime testowy",
         type: "item",
         damage: 7,
-        stackSize: 1
+        stackSize: 1,
+        recipeMaterial: "minecraft:diamond"
       })
     });
 
@@ -104,6 +105,9 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.ok([...rp.keys()].some(name => /^textures\/items\/.+\.png$/.test(name)), "Resource Pack nie ma tekstury PNG.");
     assert.ok(bp.has("manifest.json"), "Behavior Pack nie ma manifest.json.");
     assert.ok([...bp.keys()].some(name => /^items\/.+\.json$/.test(name)), "Behavior Pack nie ma definicji przedmiotu.");
-    assert.ok([...bp.keys()].some(name => /^recipes\/.+\.json$/.test(name)), "Behavior Pack nie ma receptury craftingu.");
+    const recipeName = [...bp.keys()].find(name => /^recipes\/.+\.json$/.test(name));
+    assert.ok(recipeName, "Behavior Pack nie ma receptury craftingu.");
+    const recipe = JSON.parse(bp.get(recipeName).toString("utf8"));
+    assert.ok(recipe["minecraft:recipe_shapeless"].ingredients.some(item => item.item === "minecraft:diamond"), "Wybrany składnik receptury nie został zapisany.");
   });
 });
