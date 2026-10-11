@@ -86,12 +86,18 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.match(page, /data-preset="potion"/);
     assert.match(page, /data-preset="relic"/);
     assert.match(page, /data-preset="block"/);
+    assert.match(page, /id="saveConfig"/);
+    assert.match(page, /id="loadConfigButton"/);
+    assert.match(page, /id="loadConfigFile"/);
     const scriptResponse = await fetch(`${baseUrl}/app.js`);
     assert.equal(scriptResponse.status, 200);
     const script = await scriptResponse.text();
     assert.match(script, /function drawIconPreview\(\)/);
     assert.match(script, /addEventListener\("change", drawIconPreview\)/);
     assert.match(script, /putImageData\(image, 0, 0\)/);
+    assert.match(script, /ai-addon-studio-config/);
+    assert.match(script, /function readProjectConfig\(\)/);
+    assert.match(script, /Plik jest za duży/);
   });
 
   await t.test("mcaddon contains valid resource and behavior pack files", async () => {
