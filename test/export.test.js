@@ -68,12 +68,26 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.28");
+    assert.equal(status.version, "0.4.29");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("item_set"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
     assert.ok(status.supportedTypes.includes("block"));
+  });
+
+  await t.test("live icon preview is available in the UI", async () => {
+    const pageResponse = await fetch(baseUrl);
+    assert.equal(pageResponse.status, 200);
+    const page = await pageResponse.text();
+    assert.match(page, /id="iconPreview"/);
+    assert.match(page, /id="previewLabel"/);
+    const scriptResponse = await fetch(`${baseUrl}/app.js`);
+    assert.equal(scriptResponse.status, 200);
+    const script = await scriptResponse.text();
+    assert.match(script, /function drawIconPreview\(\)/);
+    assert.match(script, /addEventListener\("change", drawIconPreview\)/);
+    assert.match(script, /putImageData\(image, 0, 0\)/);
   });
 
   await t.test("mcaddon contains valid resource and behavior pack files", async () => {
