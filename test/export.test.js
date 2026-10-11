@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.18");
+    assert.equal(status.version, "0.4.19");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
@@ -123,6 +123,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.ok(recipeName, "Behavior Pack nie ma receptury craftingu.");
     const recipe = JSON.parse(bp.get(recipeName).toString("utf8"));
     assert.ok(recipe["minecraft:recipe_shapeless"].ingredients.some(item => item.item === "minecraft:diamond"), "Wybrany składnik receptury nie został zapisany.");
+    assert.ok(recipe["minecraft:recipe_shapeless"].ingredients.some(item => item.item === "minecraft:stick"), "Domyślny drugi składnik receptury powinien być patykiem.");
     assert.equal(recipe["minecraft:recipe_shapeless"].result.count, 1, "Domyślna liczba sztuk z receptury powinna wynosić 1.");
   });
   await t.test("icon style and palette change the generated texture", async () => {
@@ -151,6 +152,23 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.notDeepEqual(crystal, orb, "Styl kuli powinien dawać inną teksturę niż kryształ.");
     assert.notDeepEqual(orb, rune, "Styl runiczny powinien różnić się od magicznej kuli.");
   });
+  await t.test("second recipe ingredient is configurable and unsupported values fall back safely", async () => {
+    async function getRecipe(recipeTool) {
+      const response = await fetch(`${baseUrl}/api/export`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: "Test drugiego skladnika", type: "item", recipeTool }) });
+      assert.equal(response.status, 200);
+      const addon = readZipEntries(Buffer.from(await response.arrayBuffer()));
+      const bpEntry = [...addon.entries()].find(([name]) => name.endsWith("-BP.mcpack"));
+      const bp = readZipEntries(bpEntry[1]);
+      const recipePath = [...bp.keys()].find(name => name.startsWith("recipes/") && name.endsWith(".json"));
+      return JSON.parse(bp.get(recipePath).toString("utf8"))["minecraft:recipe_shapeless"];
+    }
+    const boneRecipe = await getRecipe("minecraft:bone");
+    assert.ok(boneRecipe.ingredients.some(ingredient => ingredient.item === "minecraft:bone"));
+    const safeRecipe = await getRecipe("minecraft:command_block");
+    assert.ok(safeRecipe.ingredients.some(ingredient => ingredient.item === "minecraft:stick"), "Nieobsługiwana wartość powinna wrócić do domyślnego patyka.");
+    assert.ok(!safeRecipe.ingredients.some(ingredient => ingredient.item === "minecraft:command_block"));
+  });
+
   await t.test("recipe output count is configurable and bounded", async () => {
     const response = await fetch(`${baseUrl}/api/export`, {
       method: "POST",
