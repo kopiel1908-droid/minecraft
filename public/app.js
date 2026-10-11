@@ -122,6 +122,111 @@ document.querySelectorAll("[data-preset]").forEach(button => {
     description.focus();
   });
 });
+function normalizeIdea(text) {
+  return text.toLocaleLowerCase("pl").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "");
+}
+
+function matchIdeaToSettings() {
+  const raw = description.value.trim();
+  if (raw.length < 5) {
+    $("matchMessage").textContent = "Najpierw opisz pomysł w kilku słowach.";
+    description.focus();
+    return;
+  }
+  const idea = normalizeIdea(raw);
+  const changes = [];
+  const set = (id, value, label) => {
+    const field = $(id);
+    if (!field) return;
+    if (field.type === "checkbox") field.checked = Boolean(value);
+    else field.value = String(value);
+    changes.push(label);
+  };
+
+  if (/\\b(ruda|blok|kamien|cegla|mur|podloze|klocek)\\b/.test(idea)) {
+    set("type", "block", "typ: blok");
+    set("blockTextureStyle", /ceg|mur|brick/.test(idea) ? "bricks" : /metal|stal|zelaz/.test(idea) ? "metal" : /kryszt|ametyst|diament/.test(idea) ? "crystal" : "ore", "tekstura bloku");
+    set("blockHardness", /obsydian|tward/.test(idea) ? 8 : 3, "twardość");
+    set("explosionResistance", /obsydian|wybuchoodporn/.test(idea) ? 1200 : 8, "odporność na wybuch");
+    set("blockLight", /swiec|jasn|luminescen|neon/.test(idea) ? 12 : 0, "emisja światła");
+    set("blockSound", /szkl|kryszt/.test(idea) ? "glass" : /metal|stal|zelaz/.test(idea) ? "metal" : "stone", "dźwięk bloku");
+  } else {
+    set("type", idea.includes("zestaw") ? "item_set" : "item", "typ: przedmiot");
+  }
+
+  if (/miecz|szabla|katana|ostrze|bron|topor|sztylet/.test(idea)) {
+    set("damage", /legendarn|bosk|mocarn|poteg/.test(idea) ? 16 : /lekki|szybki/.test(idea) ? 7 : 12, "obrażenia");
+    set("stackSize", 1, "stos: 1");
+    set("durability", /legendarn|epick|bosk/.test(idea) ? 900 : 650, "trwałość");
+    set("handEquipped", true, "trzymanie jak broń");
+    set("itemCategory", "equipment", "kategoria: wyposażenie");
+  }
+  if (/mikstur|eliksir|napoj|butelk|potion/.test(idea)) {
+    set("stackSize", 16, "stos: 16");
+    set("durability", 0, "bez trwałości");
+    set("itemCategory", "items", "kategoria: przedmioty");
+    set("handEquipped", false, "zwykłe trzymanie");
+    set("useAnimation", /pij|napoj|eliksir|mikstur/.test(idea) ? "drink" : "drink", "animacja picia");
+  }
+  if (/ogn|plomien|poz|law|smoc|fire/.test(idea)) {
+    set("colorTheme", "fire", "paleta ognia");
+    set("iconStyle", "crystal", "ikona kryształu");
+    set("glint", true, "magiczny połysk");
+  } else if (/lod|mroz|zimn|szron|kryszt|ice/.test(idea)) {
+    set("colorTheme", "ice", "lodowa paleta");
+    set("iconStyle", "crystal", "ikona kryształu");
+  } else if (/truj|jad|toksy|venom|poison/.test(idea)) {
+    set("colorTheme", "emerald", "szmaragdowa paleta");
+    set("iconStyle", "orb", "ikona kuli");
+    set("itemEffect", "resistance", "efekt: odporność (bezpieczny zamiennik trucizny)");
+  } else if (/pustk|cien|mrok|kosmicz|void|relikt|runa/.test(idea)) {
+    set("colorTheme", "void", "paleta pustki");
+    set("iconStyle", "rune", "ikona runiczna");
+    set("rarity", "epic", "rzadkość: epicka");
+    set("glint", true, "magiczny połysk");
+  } else if (/leczen|regener|zdrow|uzdraw|heal/.test(idea)) {
+    set("colorTheme", "emerald", "szmaragdowa paleta");
+    set("iconStyle", "orb", "ikona kuli");
+    set("itemEffect", "regeneration", "efekt: regeneracja");
+    set("effectDuration", 30, "czas efektu: 30 s");
+    set("effectAmplifier", 1, "poziom efektu: II");
+  }
+  if (/szybk|przyspies|wiatr|speed/.test(idea)) {
+    set("itemEffect", "speed", "efekt: szybkość");
+    set("effectDuration", 20, "czas efektu: 20 s");
+  }
+  if (/sila|silny|moc|berserk|strength/.test(idea)) {
+    set("itemEffect", "strength", "efekt: siła");
+    set("effectDuration", 20, "czas efektu: 20 s");
+  }
+  if (/widzen.*ciem|noc|night vision/.test(idea)) {
+    set("itemEffect", "night_vision", "efekt: widzenie w ciemności");
+    set("effectDuration", 30, "czas efektu: 30 s");
+  }
+  if (/epick|legendarn|mityczn|bosk/.test(idea)) set("rarity", "epic", "rzadkość: epicka");
+  else if (/rzadk|unikaln/.test(idea)) set("rarity", "rare", "rzadkość: rzadka");
+  if (/zaklin|magicz|czar|enchanted/.test(idea)) {
+    set("glint", true, "magiczny połysk");
+    set("enchantability", 20, "możliwość zaklinania: 20");
+  }
+  if (/recept|craft|wytwor/.test(idea)) {
+    set("recipeType", /uklad|wzor|ksztalt|pattern/.test(idea) ? "shaped" : "shapeless", "receptura craftingu");
+  }
+  if (/diament|diamond/.test(idea)) set("recipeMaterial", "minecraft:diamond", "składnik: diament");
+  else if (/ametyst|amethyst/.test(idea)) set("recipeMaterial", "minecraft:amethyst_shard", "składnik: odłamek ametystu");
+  else if (/zelaz|metal|stal/.test(idea)) set("recipeMaterial", "minecraft:iron_ingot", "składnik: sztabka żelaza");
+  else if (/szmaragd|emerald/.test(idea)) set("recipeMaterial", "minecraft:emerald", "składnik: szmaragd");
+
+  $("blockSettings").hidden = $("type").value !== "block";
+  button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : $("type").value === "item_set" ? "Generuj zestaw 3 przedmiotów ↓" : "Generuj dodatek ↓";
+  $("count").textContent = `${description.value.length} / 3000`;
+  drawIconPreview();
+  $("matchMessage").textContent = `Dopasowano regułami: ${changes.length ? changes.join(", ") : "podstawowe ustawienia"}. Sprawdź pola i popraw je przed eksportem. To nie jest model AI.`;
+  message.textContent = "";
+}
+
+$("matchIdea").addEventListener("click", matchIdeaToSettings);
+
 description.addEventListener("input", () => {
   $("count").textContent = `${description.value.length} / 3000`;
 });
