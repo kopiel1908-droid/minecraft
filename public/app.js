@@ -205,6 +205,14 @@ function matchIdeaToSettings() {
     set("itemEffect", "night_vision", "efekt: widzenie w ciemności");
     set("effectDuration", 30, "czas efektu: 30 s");
   }
+
+  // Motyw trucizny ma pierwszeństwo przed innymi słowami efektów w opisie.
+  if (/truj|jad|toksy|venom|poison/.test(idea)) {
+    set("itemEffect", "none", "brak automatycznie przypisanego efektu trucizny");
+    set("colorTheme", "emerald", "szmaragdowa paleta");
+    set("iconStyle", "orb", "ikona kuli");
+    warnings.push("Wykryto motyw trucizny. Ten generator nie dodaje bezpośredniego efektu trucizny, więc wybierz efekt ręcznie zamiast podstawiać inny.");
+  }
   if (/epick|legendarn|mityczn|bosk/.test(idea)) set("rarity", "epic", "rzadkość: epicka");
   else if (/rzadk|unikaln/.test(idea)) set("rarity", "rare", "rzadkość: rzadka");
   if (/zaklin|magicz|czar|enchanted/.test(idea)) {
