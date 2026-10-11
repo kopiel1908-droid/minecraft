@@ -63,6 +63,65 @@ function drawIconPreview() {
 $("iconStyle").addEventListener("change", drawIconPreview);
 $("colorTheme").addEventListener("change", drawIconPreview);
 drawIconPreview();
+
+const presets = {
+  weapon: {
+    description: "Miecz kryształowy mrozu",
+    type: "item", damage: 12, stackSize: 1, durability: 650,
+    rarity: "rare", glint: true, itemCategory: "equipment", handEquipped: true,
+    iconStyle: "crystal", colorTheme: "ice", itemEffect: "none",
+    recipeMaterial: "minecraft:diamond", recipeTool: "minecraft:stick",
+    recipeType: "shaped", recipeCount: 1, cooldownSeconds: 0,
+    enchantability: 18, enchantSlot: "sword", useAnimation: "default"
+  },
+  potion: {
+    description: "Eliksir regeneracji",
+    type: "item", damage: 1, stackSize: 16, durability: 0,
+    rarity: "uncommon", glint: true, itemCategory: "items", handEquipped: false,
+    iconStyle: "orb", colorTheme: "emerald", itemEffect: "regeneration",
+    effectDuration: 30, effectAmplifier: 1, recipeMaterial: "minecraft:slime_ball",
+    recipeTool: "minecraft:amethyst_shard", recipeType: "shapeless", recipeCount: 1,
+    cooldownSeconds: 5, enchantability: 0, enchantSlot: "sword", useAnimation: "drink"
+  },
+  relic: {
+    description: "Epicki relikt pustki",
+    type: "item", damage: 8, stackSize: 1, durability: 900,
+    rarity: "epic", glint: true, itemCategory: "equipment", handEquipped: false,
+    iconStyle: "rune", colorTheme: "void", itemEffect: "night_vision",
+    effectDuration: 20, effectAmplifier: 0, recipeMaterial: "minecraft:amethyst_shard",
+    recipeTool: "minecraft:blaze_rod", recipeType: "shaped", recipeCount: 1,
+    cooldownSeconds: 10, enchantability: 25, enchantSlot: "all", useAnimation: "default"
+  },
+  block: {
+    description: "Świecąca ruda szmaragdowa",
+    type: "block", damage: 7, stackSize: 64, durability: 0,
+    rarity: "rare", glint: false, itemCategory: "nature", handEquipped: false,
+    iconStyle: "crystal", colorTheme: "emerald", itemEffect: "none",
+    recipeMaterial: "minecraft:iron_ingot", recipeTool: "minecraft:stick",
+    recipeType: "shapeless", recipeCount: 1, blockHardness: 3,
+    explosionResistance: 8, blockLight: 12, blockFriction: 0.6,
+    blockSound: "stone", blockTextureStyle: "ore"
+  }
+};
+document.querySelectorAll("[data-preset]").forEach(button => {
+  button.addEventListener("click", () => {
+    const preset = presets[button.dataset.preset];
+    if (!preset) return;
+    for (const [id, value] of Object.entries(preset)) {
+      const field = $(id);
+      if (!field) continue;
+      if (field.type === "checkbox") field.checked = Boolean(value);
+      else field.value = String(value);
+    }
+    $("blockSettings").hidden = preset.type !== "block";
+    $("count").textContent = `${description.value.length} / 3000`;
+    $("export").textContent = preset.type === "block" ? "Generuj blok ↓" : "Generuj dodatek ↓";
+    drawIconPreview();
+    $("presetMessage").textContent = `Ustawiono szablon: ${button.textContent.trim()}. Możesz edytować każde pole przed eksportem.`;
+    message.textContent = "";
+    description.focus();
+  });
+});
 description.addEventListener("input", () => {
   $("count").textContent = `${description.value.length} / 3000`;
 });
