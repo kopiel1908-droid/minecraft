@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0d10">
-  <title>AI Addon Studio 0.4.18</title>
+  <title>AI Addon Studio 0.4.19</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
       <span class="status"><span class="dot"></span> lokalnie</span>
     </header>
     <section class="hero">
-      <span class="tag">WERSJA 0.4.18</span>
+      <span class="tag">WERSJA 0.4.19</span>
       <h2>Twój pomysł.<br><em>Twój dodatek.</em></h2>
       <p>Generator tworzy paczkę zasobów, prototyp przedmiotu albo eksperymentalny blok do Minecraft Bedrock. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
     </section>
@@ -76,6 +76,14 @@
         <option value="minecraft:slime_ball">Kula szlamu + patyk</option>
         <option value="minecraft:amethyst_shard">Odłamek ametystu + patyk</option>
       </select>
+      <label for="recipeTool">Drugi składnik receptury</label>
+      <select id="recipeTool">
+        <option value="minecraft:stick">Patyk</option>
+        <option value="minecraft:blaze_rod">Płomienna różdżka (blaze rod)</option>
+        <option value="minecraft:bone">Kość</option>
+        <option value="minecraft:amethyst_shard">Odłamek ametystu</option>
+      </select>
+      <p class="hint">Dobierz drugi składnik do charakteru przedmiotu. To nadal receptura bez układu 3×3.</p>
       <label for="recipeCount">Ile sztuk daje crafting?</label>
       <select id="recipeCount">
         <option value="1">1 sztuka</option>
@@ -89,12 +97,12 @@
     </section>
     <section class="panel details">
       <p class="eyebrow">02 / CO JEST GOTOWE</p>
-      <h3>Generator 0.4.18</h3>
+      <h3>Generator 0.4.19</h3>
       <ul>
         <li>Tworzy osobne manifesty Behavior Pack i Resource Pack.</li>
         <li>Dodaje definicję przedmiotu, wybieraną teksturę PNG pixel-art z paletą kolorów, obrażenia, trwałość, rzadkość, magiczny połysk i wielkość stosu i liczbę sztuk z receptury craftingu.</li>
         <li>Eksportuje paczkę .mcaddon lub .mcpack.</li>
-        <li>Do wyboru są trzy style ikony: miecz, kryształ i magiczna kula oraz pięć palet kolorów. Bloki są eksperymentalne; mobów, pojazdów i map jeszcze nie generuje.</li>
+        <li>Do wyboru są cztery style ikony: miecz, kryształ, magiczna kula i runiczny talizman oraz pięć palet kolorów. Można też wybrać drugi składnik receptury. Bloki są eksperymentalne; mobów, pojazdów i map jeszcze nie generuje.</li>
       </ul>
     </section>
     <footer>AI Addon Studio • Minecraft Bedrock • wersja eksperymentalna</footer>
