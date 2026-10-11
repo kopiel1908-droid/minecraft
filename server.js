@@ -148,7 +148,7 @@ function createResourcePack(root,packName,itemId,itemName,description,packUuid,i
   });
   return rp;
 }
-function createBlockResourcePack(root,packName,blockId,blockName,description,packUuid,colorTheme="ice"){
+function createBlockResourcePack(root,packName,blockId,blockName,description,packUuid,colorTheme="ice",blockSound="stone"){
   const rp=path.join(root,"resource_pack");
   writeJson(path.join(rp,"manifest.json"),{format_version:2,header:{name:packName+" Block RP",description:"Tekstury bloku wygenerowane przez AI Addon Studio",uuid:packUuid,version:[1,0,0],min_engine_version:[1,20,80]},modules:[{type:"resources",uuid:randomUUID(),version:[1,0,0]}]});
   fs.mkdirSync(path.join(rp,"texts"),{recursive:true});
@@ -158,7 +158,7 @@ function createBlockResourcePack(root,packName,blockId,blockName,description,pac
   const blockDir=path.join(rp,"textures","blocks"); fs.mkdirSync(blockDir,{recursive:true});
   fs.writeFileSync(path.join(blockDir,blockId+".png"),makeIcon(blockId,"crystal",colorTheme));
   writeJson(path.join(rp,"textures","terrain_texture.json"),{resource_pack_name:packName,texture_name:"atlas.terrain",padding:8,num_mip_levels:4,texture_data:{[blockId]:{textures:"textures/blocks/"+blockId}}});
-  writeJson(path.join(rp,"blocks.json"),{["studio:"+blockId]:{textures:blockId,sound:"stone"}});
+  writeJson(path.join(rp,"blocks.json"),{["studio:"+blockId]:{textures:blockId,sound:blockSound}});
   return rp;
 }
 function createBlockBehaviorPack(root,packName,blockId,blockName,description,rpUuid,options={}){
@@ -214,7 +214,7 @@ async function buildExport(description,type,options={}){
     const blockId=itemId.slice(0,24)||"custom_block",packName=safeName(itemName),root=path.join(os.tmpdir(),"ai-addon-"+randomUUID());
     fs.mkdirSync(root,{recursive:true}); const temporary=[];
     try{
-      const rpUuid=randomUUID(); createBlockResourcePack(root,packName,blockId,itemName,description,rpUuid,options.colorTheme); createBlockBehaviorPack(root,packName,blockId,itemName,description,rpUuid,options);
+      const rpUuid=randomUUID(); createBlockResourcePack(root,packName,blockId,itemName,description,rpUuid,options.colorTheme,options.blockSound); createBlockBehaviorPack(root,packName,blockId,itemName,description,rpUuid,options);
       const rpFile=path.join(root,packName+"-RP.mcpack"),bpFile=path.join(root,packName+"-BP.mcpack");
       await zipDirectory(path.join(root,"resource_pack"),rpFile); await zipDirectory(path.join(root,"behavior_pack"),bpFile);
       const container=path.join(root,"addon_container"); fs.mkdirSync(container); fs.copyFileSync(rpFile,path.join(container,packName+"-RP.mcpack")); fs.copyFileSync(bpFile,path.join(container,packName+"-BP.mcpack"));
@@ -259,7 +259,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.14",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.15",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -288,7 +288,10 @@ const server=http.createServer(async(req,res)=>{
       const blockLight=Math.max(0,Math.min(15,Math.round(Number.isFinite(blockLightValue)&&body.blockLight!==""?blockLightValue:0)));
       const frictionValue=Number(body.blockFriction);
       const blockFriction=Math.max(0,Math.min(1,Number.isFinite(frictionValue)&&body.blockFriction!==""?frictionValue:0.6));
-      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeCount,durability,rarity,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction});
+      const allowedBlockSounds=new Set(["stone","wood","glass","grass","metal"]);
+      const requestedBlockSound=String(body.blockSound||"stone");
+      const blockSound=allowedBlockSounds.has(requestedBlockSound)?requestedBlockSound:"stone";
+      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeCount,durability,rarity,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
@@ -301,4 +304,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.14 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.15 działa: http://localhost:${port}`));
