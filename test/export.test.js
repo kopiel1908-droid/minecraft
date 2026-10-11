@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.11");
+    assert.equal(status.version, "0.4.12");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
@@ -167,7 +167,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/export`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: "Blok ametystowy", type: "block", colorTheme: "void" })
+      body: JSON.stringify({ description: "Blok ametystowy", type: "block", colorTheme: "void", blockHardness: 4.5, explosionResistance: 12 })
     });
     const bytes = Buffer.from(await response.arrayBuffer());
     assert.equal(response.status, 200, bytes.toString("utf8").slice(0, 300));
@@ -186,6 +186,8 @@ test("AI Addon Studio smoke tests", async (t) => {
     const block = JSON.parse(bp.get(blockPath).toString("utf8"))["minecraft:block"];
     assert.equal(block.description.identifier, "studio:blok_ametystowy");
     assert.equal(block.components["minecraft:material_instances"]["*"].texture, "blok_ametystowy");
+    assert.equal(block.components["minecraft:destructible_by_mining"].seconds_to_destroy, 4.5);
+    assert.equal(block.components["minecraft:destructible_by_explosion"].explosion_resistance, 12);
   });
 
   await t.test("rejects descriptions that are too short and unsupported project types", async () => {
