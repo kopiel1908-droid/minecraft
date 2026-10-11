@@ -164,7 +164,7 @@ function createBlockResourcePack(root,packName,blockId,blockName,description,pac
 function createBlockBehaviorPack(root,packName,blockId,blockName,description,rpUuid,options={}){
   const bp=path.join(root,"behavior_pack"),packUuid=randomUUID();
   writeJson(path.join(bp,"manifest.json"),{format_version:2,header:{name:packName+" Block BP",description:"Definicja bloku wygenerowana przez AI Addon Studio",uuid:packUuid,version:[1,0,0],min_engine_version:[1,20,80]},modules:[{type:"data",uuid:randomUUID(),version:[1,0,0]}],dependencies:[{uuid:rpUuid,version:[1,0,0]}]});
-  writeJson(path.join(bp,"blocks",blockId+".json"),{format_version:"1.20.80","minecraft:block":{description:{identifier:"studio:"+blockId,menu_category:{category:"construction"}},components:{"minecraft:geometry":"minecraft:geometry.full_block","minecraft:material_instances":{"*":{texture:blockId,render_method:"opaque"}},"minecraft:collision_box":true,"minecraft:selection_box":true,"minecraft:destructible_by_mining":{seconds_to_destroy:options.blockHardness??1.5},"minecraft:destructible_by_explosion":{explosion_resistance:options.explosionResistance??3}}}});
+  writeJson(path.join(bp,"blocks",blockId+".json"),{format_version:"1.20.80","minecraft:block":{description:{identifier:"studio:"+blockId,menu_category:{category:"construction"}},components:{"minecraft:geometry":"minecraft:geometry.full_block","minecraft:material_instances":{"*":{texture:blockId,render_method:"opaque"}},"minecraft:collision_box":true,"minecraft:selection_box":true,"minecraft:light_emission":options.blockLight??0,"minecraft:destructible_by_mining":{seconds_to_destroy:options.blockHardness??1.5},"minecraft:destructible_by_explosion":{explosion_resistance:options.explosionResistance??3}}}});
   fs.mkdirSync(path.join(bp,"texts"),{recursive:true});
   fs.writeFileSync(path.join(bp,"texts","README.txt"),"Pomysł: "+description+"\nBlok: studio:"+blockId+"\n\nWłącz Behavior Pack i Resource Pack w ustawieniach świata. Prototyp bloku wymaga testu w docelowej wersji Bedrock.\n");
   return bp;
@@ -259,7 +259,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.12",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.13",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -282,8 +282,11 @@ const server=http.createServer(async(req,res)=>{
       const requestedColorTheme=String(body.colorTheme||"ice");
       const colorTheme=new Set(["ice","fire","emerald","void","gold"]).has(requestedColorTheme)?requestedColorTheme:"ice";
       const blockHardness=Math.max(0.1,Math.min(10,Number(body.blockHardness)||1.5));
-      const explosionResistance=Math.max(0,Math.min(1200,Number(body.explosionResistance)||3));
-      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeCount,durability,rarity,iconStyle,colorTheme,blockHardness,explosionResistance});
+      const explosionValue=Number(body.explosionResistance);
+      const explosionResistance=Math.max(0,Math.min(1200,Number.isFinite(explosionValue)&&body.explosionResistance!==""?explosionValue:3));
+      const blockLightValue=Number(body.blockLight);
+      const blockLight=Math.max(0,Math.min(15,Math.round(Number.isFinite(blockLightValue)&&body.blockLight!==""?blockLightValue:0)));
+      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeCount,durability,rarity,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
@@ -296,4 +299,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.12 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.13 działa: http://localhost:${port}`));
