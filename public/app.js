@@ -15,14 +15,14 @@ button.addEventListener("click", async () => {
     description.focus();
     return;
   }
-  button.disabled = true;
+  const damage = Number($("damage").value), stackSize = Number($("stackSize").value);\n  if (!Number.isInteger(damage) || damage < 1 || damage > 20) { message.textContent = "Obrażenia muszą być liczbą całkowitą od 1 do 20."; $("damage").focus(); return; }\n  if (!Number.isInteger(stackSize) || stackSize < 1 || stackSize > 64) { message.textContent = "Wielkość stosu musi być liczbą całkowitą od 1 do 64."; $("stackSize").focus(); return; }\n  button.disabled = true;
   button.textContent = "Tworzę paczkę…";
   message.textContent = "Generuję pliki Minecraft Bedrock…";
   try {
     const response = await fetch("/api/export", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: value, type: $("type").value })
+      body: JSON.stringify({ description: value, type: $("type").value, damage: Number($("damage").value), stackSize: Number($("stackSize").value) })
     });
     if (!response.ok) {
       let error = {};
