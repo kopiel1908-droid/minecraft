@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.17");
+    assert.equal(status.version, "0.4.18");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
@@ -146,8 +146,10 @@ test("AI Addon Studio smoke tests", async (t) => {
     const sword = await exportTexture("sword", "ice");
     const crystal = await exportTexture("crystal", "fire");
     const orb = await exportTexture("orb", "void");
+    const rune = await exportTexture("rune", "gold");
     assert.notDeepEqual(sword, crystal, "Styl kryształu powinien dawać inną teksturę niż miecz.");
     assert.notDeepEqual(crystal, orb, "Styl kuli powinien dawać inną teksturę niż kryształ.");
+    assert.notDeepEqual(orb, rune, "Styl runiczny powinien różnić się od magicznej kuli.");
   });
   await t.test("recipe output count is configurable and bounded", async () => {
     const response = await fetch(`${baseUrl}/api/export`, {
