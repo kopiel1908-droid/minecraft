@@ -1,4 +1,4 @@
-# AI Addon Studio 0.4.18
+# AI Addon Studio 0.4.19
 
 Lokalny prototyp narzędzia do tworzenia paczek Minecraft Bedrock.
 
@@ -19,7 +19,7 @@ Następnie otwórz http://localhost:3000.
 - Osobne manifesty i zależność Behavior Pack od Resource Pack.
 - Cztery style tekstury PNG pixel-art: miecz, kryształ, magiczna kula i runiczny talizman; pięć palet kolorów: lodowy błękit, ogień, szmaragd, pustka i złoto.
 - Ustawiane obrażenia (1–20), trwałość (0–1000; 0 wyłącza komponent), rzadkość (zwykły, niezwykły, rzadki, epicki) i opcjonalny magiczny połysk i wielkość stosu (1–64).
-- Prosta receptura craftingu z wyborem składnika i liczbą otrzymywanych sztuk (1–4).
+- Prosta receptura craftingu z wyborem głównego składnika, drugiego składnika (patyk, blaze rod, kość lub odłamek ametystu) i liczbą otrzymywanych sztuk (1–4).
 - Eksperymentalny blok z czterema wzorami tekstury PNG (kryształ, cegły, ruda, metal), mapowaniem atlasu terenu, definicją `minecraft:block`, ustawianą twardością, odpornością na wybuch i emisją światła (0–15), tarciem powierzchni (0–1) i dźwiękiem (kamień, drewno, szkło, trawa, metal) oraz eksportem `.mcaddon`.
 
 ## Ograniczenia
