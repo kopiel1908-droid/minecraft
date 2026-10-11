@@ -1,4 +1,4 @@
-# AI Addon Studio 0.4.4
+# AI Addon Studio 0.4.5
 
 Lokalny prototyp narzędzia do tworzenia paczek Minecraft Bedrock.
 
@@ -17,7 +17,7 @@ Następnie otwórz http://localhost:3000.
 - Eksport prototypu dodatku przedmiotowego jako `.mcaddon`, który zawiera pliki `.mcpack` dla Behavior Pack i Resource Pack.
 - Eksport paczki zasobów jako `.mcpack`.
 - Osobne manifesty i zależność Behavior Pack od Resource Pack.
-- Generowana tekstura PNG w stylu pixel-art.
+- Trzy style tekstury PNG pixel-art do wyboru: miecz, kryształ i magiczna kula.
 - Ustawiane obrażenia przedmiotu (1–20) i wielkość stosu (1–64).
 - Prosta receptura craftingu dla generowanego przedmiotu, z wyborem składnika.
 
@@ -27,6 +27,6 @@ To nie jest jeszcze generator AI: opis służy głównie jako nazwa, a grafika j
 
 ## Testowanie
 
-Uruchom automatyczne testy dymne poleceniem `npm test`. Sprawdzają endpoint statusu, archiwum `.mcaddon`, obecność paczek `.mcpack`, manifestów, tekstury, definicji przedmiotu i receptury z wybranym składnikiem.
+Uruchom automatyczne testy dymne poleceniem `npm test`. Sprawdzają endpoint statusu, archiwum `.mcaddon`, obecność paczek `.mcpack`, manifestów, tekstury, definicji przedmiotu i receptury z wybranym składnikiem. Styl ikony można wybrać w interfejsie.
 
 Po uruchomieniu sprawdź `http://localhost:3000/api/status`. Importuj wygenerowane paczki najpierw w kopii świata testowego.
