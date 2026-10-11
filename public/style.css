@@ -6,3 +6,11 @@
 #iconPreview{display:block;width:96px;height:96px;image-rendering:pixelated;image-rendering:crisp-edges}
 .preview-copy{min-width:0}.preview-copy .eyebrow{margin:0 0 4px}.preview-copy h3{font-size:16px;margin:0 0 3px}.preview-copy p{margin:0}.preview-copy .hint{margin-top:8px}
 @media(max-width:420px){.preview-card{align-items:flex-start;gap:12px;padding:10px}.preview-art{flex-basis:88px;width:88px;height:88px}#iconPreview{width:72px;height:72px}}
+
+.preset-panel{margin:18px 0 6px;padding:15px;border:1px solid var(--line);border-radius:12px;background:#0d1013}
+.preset-panel>.eyebrow{margin:0}.preset-panel>.hint{margin:6px 0 10px}
+.preset-buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+button.preset-button{background:#20282e;color:var(--text);border:1px solid #384149;padding:10px;font-size:13px;text-align:left}
+button.preset-button:hover{border-color:var(--green);background:#263326}
+button.preset-button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+@media(max-width:420px){.preset-buttons{grid-template-columns:1fr}}
