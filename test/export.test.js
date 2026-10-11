@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.6");
+    assert.equal(status.version, "0.4.7");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
@@ -115,4 +115,29 @@ test("AI Addon Studio smoke tests", async (t) => {
     const recipe = JSON.parse(bp.get(recipeName).toString("utf8"));
     assert.ok(recipe["minecraft:recipe_shapeless"].ingredients.some(item => item.item === "minecraft:diamond"), "Wybrany składnik receptury nie został zapisany.");
   });
+  await t.test("icon style and palette change the generated texture", async () => {
+    async function exportTexture(iconStyle, colorTheme) {
+      const response = await fetch(`${baseUrl}/api/export`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: "Porownanie ikony testowej",
+          type: "resource_pack",
+          iconStyle,
+          colorTheme
+        })
+      });
+      assert.equal(response.status, 200);
+      const archive = readZipEntries(Buffer.from(await response.arrayBuffer()));
+      const texturePath = [...archive.keys()].find(name => /^textures\\/items\\/.+\\.png$/.test(name));
+      assert.ok(texturePath, "Eksport nie zawiera tekstury PNG.");
+      return archive.get(texturePath);
+    }
+    const sword = await exportTexture("sword", "ice");
+    const crystal = await exportTexture("crystal", "fire");
+    const orb = await exportTexture("orb", "void");
+    assert.notDeepEqual(sword, crystal, "Styl kryształu powinien dawać inną teksturę niż miecz.");
+    assert.notDeepEqual(crystal, orb, "Styl kuli powinien dawać inną teksturę niż kryształ.");
+  });
+
 });
