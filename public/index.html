@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0d10">
-  <title>AI Addon Studio 0.3.0</title>
+  <title>AI Addon Studio 0.4.0</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
       <span class="status"><span class="dot"></span> lokalnie</span>
     </header>
     <section class="hero">
-      <span class="tag">WERSJA 0.3.0</span>
+      <span class="tag">WERSJA 0.4.0</span>
       <h2>Twój pomysł.<br><em>Twój dodatek.</em></h2>
       <p>Generator tworzy paczkę zasobów lub prototyp dodatku z własnym przedmiotem do Minecraft Bedrock. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
     </section>
@@ -34,16 +34,20 @@
       </select>
       <label for="description">Opisz swój pomysł</label>
       <textarea id="description" maxlength="3000" placeholder="Np. Mroźny miecz, który wygląda jak kryształ lodu..."></textarea>
+      <div class="settings-grid">
+        <div><label for="damage">Obrażenia przedmiotu</label><input id="damage" type="number" min="1" max="20" value="7"><p class="hint">Dla broni: 1–20</p></div>
+        <div><label for="stackSize">Maks. liczba w stosie</label><input id="stackSize" type="number" min="1" max="64" value="1"><p class="hint">Od 1 do 64 sztuk</p></div>
+      </div>
       <div class="foot"><span id="count">0 / 3000</span><button id="export">Generuj dodatek ↓</button></div>
       <p class="hint">Przedmiot: plik .mcaddon zawierający Behavior Pack i Resource Pack. Paczka zasobów: .mcpack. Własny model 3D i generowanie AI nie są jeszcze dostępne.</p>
       <p id="message" role="status" aria-live="polite"></p>
     </section>
     <section class="panel details">
       <p class="eyebrow">02 / CO JEST GOTOWE</p>
-      <h3>Generator 0.3.0</h3>
+      <h3>Generator 0.4.0</h3>
       <ul>
         <li>Tworzy osobne manifesty Behavior Pack i Resource Pack.</li>
-        <li>Dodaje definicję prostego przedmiotu i teksturę PNG w stylu pixel-art.</li>
+        <li>Dodaje definicję przedmiotu, teksturę PNG pixel-art oraz ustawiane obrażenia i wielkość stosu.</li>
         <li>Eksportuje paczkę .mcaddon lub .mcpack.</li>
         <li>Mobów, bloków, pojazdów i map jeszcze nie generuje.</li>
       </ul>
