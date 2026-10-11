@@ -129,7 +129,7 @@ test("AI Addon Studio smoke tests", async (t) => {
       });
       assert.equal(response.status, 200);
       const archive = readZipEntries(Buffer.from(await response.arrayBuffer()));
-      const texturePath = [...archive.keys()].find(name => /^textures\\/items\\/.+\\.png$/.test(name));
+      const texturePath = [...archive.keys()].find(name => /^textures\/items\/.+\.png$/.test(name));
       assert.ok(texturePath, "Eksport nie zawiera tekstury PNG.");
       return archive.get(texturePath);
     }
