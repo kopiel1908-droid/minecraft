@@ -14,3 +14,13 @@ button.preset-button{background:#20282e;color:var(--text);border:1px solid #3841
 button.preset-button:hover{border-color:var(--green);background:#263326}
 button.preset-button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
 @media(max-width:420px){.preset-buttons{grid-template-columns:1fr}}
+
+.match-panel {
+  margin: 12px 0 22px;
+  padding: 14px;
+  border: 1px solid var(--line, #303741);
+  border-radius: 14px;
+  background: rgba(255,255,255,.025);
+}
+.match-panel .preset-button { width: 100%; }
+.match-panel .hint { margin-bottom: 0; }
