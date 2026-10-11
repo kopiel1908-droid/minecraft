@@ -81,7 +81,7 @@ function pngChunk(type,data){
   length.writeUInt32BE(data.length);crc.writeUInt32BE(crc32(Buffer.concat([name,data])));
   return Buffer.concat([length,name,data,crc]);
 }
-function makeIcon(seed){
+function makeIcon(seed,style="sword"){
   const width=16,height=16,pixels=Buffer.alloc(width*height*4);
   let hash=0;for(const ch of seed)hash=(hash*31+ch.charCodeAt(0))>>>0;
   const base=[45+(hash%45),100+((hash>>>7)%100),145+((hash>>>13)%90)];
@@ -98,7 +98,7 @@ function makeIcon(seed){
   return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),pngChunk("IHDR",header),pngChunk("IDAT",zlib.deflateSync(raw)),pngChunk("IEND",Buffer.alloc(0))]);
 }
 function writeJson(file,value){fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,JSON.stringify(value,null,2)+"\n","utf8");}
-function createResourcePack(root,packName,itemId,itemName,description,packUuid){
+function createResourcePack(root,packName,itemId,itemName,description,packUuid,iconStyle="sword"){
   const rp=path.join(root,"resource_pack");
   const moduleUuid=randomUUID();
   writeJson(path.join(rp,"manifest.json"),{
@@ -112,7 +112,7 @@ function createResourcePack(root,packName,itemId,itemName,description,packUuid){
   fs.writeFileSync(path.join(rp,"texts","pl_PL.lang"),`item.${itemId}.name=${itemName}\npack.name=${packName} RP\npack.description=Zasoby wygenerowane przez AI Addon Studio\n`);
   const itemTexturesDir=path.join(rp,"textures","items");
   const itemTextureFile=path.join(itemTexturesDir,`${itemId}.png`);
-  const iconBytes=makeIcon(itemId);
+  const iconBytes=makeIcon(itemId,iconStyle);
   // Twórz katalog bezpośrednio przed zapisem, żeby uniknąć ENOENT na Windows.
   fs.mkdirSync(itemTexturesDir,{recursive:true});
   fs.writeFileSync(itemTextureFile,iconBytes);
@@ -168,13 +168,13 @@ async function buildExport(description,type,options={}){
   const temporary=[];
   try{
     if(type==="resource_pack"){
-      createResourcePack(root,packName,itemId,itemName,description,randomUUID());
+      createResourcePack(root,packName,itemId,itemName,description,randomUUID(),options.iconStyle);
       const output=path.join(os.tmpdir(),`${packName}-${randomUUID()}.mcpack`);
       await zipDirectory(path.join(root,"resource_pack"),output);temporary.push(output);
       return {output,filename:`${packName}.mcpack`,contentType:"application/octet-stream",cleanup:()=>{fs.rmSync(root,{recursive:true,force:true});for(const f of temporary)fs.rmSync(f,{force:true});}};
     }
     const rpUuid=randomUUID();
-    createResourcePack(root,packName,itemId,itemName,description,rpUuid);
+    createResourcePack(root,packName,itemId,itemName,description,rpUuid,options.iconStyle);
     createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,options);
     const rpFile=path.join(root,`${packName}-RP.mcpack`),bpFile=path.join(root,`${packName}-BP.mcpack`);
     await zipDirectory(path.join(root,"resource_pack"),rpFile);
@@ -200,7 +200,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.4",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.5",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -226,4 +226,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.4 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.5 działa: http://localhost:${port}`));
