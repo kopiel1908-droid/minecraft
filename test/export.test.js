@@ -68,10 +68,11 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.10");
+    assert.equal(status.version, "0.4.11");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("resource_pack"));
+    assert.ok(status.supportedTypes.includes("block"));
   });
 
   await t.test("mcaddon contains valid resource and behavior pack files", async () => {
@@ -159,6 +160,32 @@ test("AI Addon Studio smoke tests", async (t) => {
     const bp = readZipEntries(bpEntry[1]);
     const recipePath = [...bp.keys()].find(name => name.startsWith("recipes/") && name.endsWith(".json"));
     assert.equal(JSON.parse(bp.get(recipePath).toString("utf8"))["minecraft:recipe_shapeless"].result.count, 3);
+  });
+
+
+  await t.test("block export contains a block definition and terrain texture", async () => {
+    const response = await fetch(`${baseUrl}/api/export`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description: "Blok ametystowy", type: "block", colorTheme: "void" })
+    });
+    const bytes = Buffer.from(await response.arrayBuffer());
+    assert.equal(response.status, 200, bytes.toString("utf8").slice(0, 300));
+    assert.match(response.headers.get("content-disposition") || "", /\.mcaddon/i);
+    const addon = readZipEntries(bytes);
+    const rpEntry = [...addon.entries()].find(([name]) => name.endsWith("-RP.mcpack"));
+    const bpEntry = [...addon.entries()].find(([name]) => name.endsWith("-BP.mcpack"));
+    assert.ok(rpEntry && bpEntry, "Blok powinien mieć Resource Pack i Behavior Pack.");
+    const rp = readZipEntries(rpEntry[1]);
+    const bp = readZipEntries(bpEntry[1]);
+    assert.ok(rp.has("textures/terrain_texture.json"), "Brakuje atlasu tekstur bloków.");
+    assert.ok(rp.has("blocks.json"), "Brakuje mapowania tekstury bloku.");
+    assert.ok([...rp.keys()].some(name => name.startsWith("textures/blocks/") && name.endsWith(".png")), "Brakuje tekstury PNG bloku.");
+    const blockPath = [...bp.keys()].find(name => name.startsWith("blocks/") && name.endsWith(".json"));
+    assert.ok(blockPath, "Behavior Pack nie zawiera definicji bloku.");
+    const block = JSON.parse(bp.get(blockPath).toString("utf8"))["minecraft:block"];
+    assert.equal(block.description.identifier, "studio:blok_ametystowy");
+    assert.equal(block.components["minecraft:material_instances"]["*"].texture, "blok_ametystowy");
   });
 
   await t.test("rejects descriptions that are too short and unsupported project types", async () => {
