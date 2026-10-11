@@ -44,6 +44,16 @@
         </div>
         <p id="presetMessage" class="hint" role="status" aria-live="polite">Szablon tylko ustawia formularz. Nic nie zostanie wygenerowane, dopóki nie klikniesz przycisku eksportu.</p>
       </div>
+      <div class="preset-panel">
+        <p class="eyebrow">USTAWIENIA PROJEKTU</p>
+        <p class="hint">Zapisz konfigurację do pliku JSON albo wczytaj ją później. Przydatne, gdy eksperymentujesz z kilkoma pomysłami.</p>
+        <div class="preset-buttons">
+          <button type="button" id="saveConfig" class="preset-button">💾 Zapisz ustawienia</button>
+          <button type="button" id="loadConfigButton" class="preset-button">📂 Wczytaj ustawienia</button>
+          <input type="file" id="loadConfigFile" accept=".json,application/json" hidden>
+        </div>
+        <p id="configMessage" class="hint" role="status" aria-live="polite">Plik zawiera ustawienia formularza, nie gotowy dodatek.</p>
+      </div>
       <label for="description">Opisz swój pomysł</label>
       <textarea id="description" maxlength="3000" placeholder="Np. Mroźny miecz, który wygląda jak kryształ lodu..."></textarea>
       <div class="match-panel">
