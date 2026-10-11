@@ -191,6 +191,7 @@ function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,opt
         "minecraft:hand_equipped":true,
         "minecraft:damage":options.damage??7,
         "minecraft:rarity":{value:options.rarity??"common"},
+        "minecraft:glint":options.glint===true,
         ...(options.durability > 0 ? {"minecraft:durability":{max_durability:options.durability}} : {})
       }
     }
@@ -259,7 +260,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.15",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.16",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -291,7 +292,8 @@ const server=http.createServer(async(req,res)=>{
       const allowedBlockSounds=new Set(["stone","wood","glass","grass","metal"]);
       const requestedBlockSound=String(body.blockSound||"stone");
       const blockSound=allowedBlockSounds.has(requestedBlockSound)?requestedBlockSound:"stone";
-      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeCount,durability,rarity,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound});
+      const glint=body.glint===true;
+      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeCount,durability,rarity,glint,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
@@ -304,4 +306,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.15 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.16 działa: http://localhost:${port}`));
