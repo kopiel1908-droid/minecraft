@@ -20,6 +20,15 @@ async function waitForServer(child) {
   throw new Error("Serwer nie uruchomił się w ciągu 15 sekund.");
 }
 
+function crc32(buffer) {
+  let crc = 0xffffffff;
+  for (const byte of buffer) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit++) crc = (crc & 1) ? (0xedb88320 ^ (crc >>> 1)) : (crc >>> 1);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
 function readZipEntries(buffer) {
   const entries = new Map();
   let eocd = -1;
@@ -32,7 +41,9 @@ function readZipEntries(buffer) {
   for (let i = 0; i < count; i++) {
     assert.equal(buffer.readUInt32LE(cursor), 0x02014b50, "Nieprawidłowy wpis centralnego katalogu ZIP.");
     const method = buffer.readUInt16LE(cursor + 10);
+    const expectedCrc = buffer.readUInt32LE(cursor + 16);
     const compressedSize = buffer.readUInt32LE(cursor + 20);
+    const uncompressedSize = buffer.readUInt32LE(cursor + 24);
     const nameLength = buffer.readUInt16LE(cursor + 28);
     const extraLength = buffer.readUInt16LE(cursor + 30);
     const commentLength = buffer.readUInt16LE(cursor + 32);
@@ -46,6 +57,8 @@ function readZipEntries(buffer) {
     if (method === 0) data = Buffer.from(compressed);
     else if (method === 8) data = inflateRawSync(compressed);
     else throw new Error(`Nieobsługiwana metoda kompresji ZIP: ${method}`);
+    assert.equal(data.length, uncompressedSize, `Nieprawidłowy rozmiar rozpakowanego pliku ZIP: ${name}`);
+    assert.equal(crc32(data), expectedCrc, `Błąd CRC w archiwum ZIP: ${name}`);
     entries.set(name, data);
     cursor += 46 + nameLength + extraLength + commentLength;
   }
