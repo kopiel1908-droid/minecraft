@@ -168,7 +168,8 @@ function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,opt
         "minecraft:display_name":{value:itemName},
         "minecraft:max_stack_size":options.stackSize??1,
         "minecraft:hand_equipped":true,
-        "minecraft:damage":options.damage??7
+        "minecraft:damage":options.damage??7,
+        ...(options.durability > 0 ? {"minecraft:durability":{max_durability:options.durability}} : {})
       }
     }
   });
@@ -224,7 +225,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.8",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.9",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -235,6 +236,7 @@ const server=http.createServer(async(req,res)=>{
       const damage=Math.max(1,Math.min(20,Math.round(Number(body.damage)||7)));
       const stackSize=Math.max(1,Math.min(64,Math.round(Number(body.stackSize)||1)));
       const recipeCount=Math.max(1,Math.min(4,Math.round(Number(body.recipeCount)||1)));
+      const durability=Math.max(0,Math.min(1000,Math.round(Number(body.durability)||0)));
       const allowedRecipeMaterials=new Set(["minecraft:iron_ingot","minecraft:gold_ingot","minecraft:diamond","minecraft:emerald","minecraft:slime_ball","minecraft:amethyst_shard"]);
       const requestedMaterial=String(body.recipeMaterial||"minecraft:iron_ingot");
       const recipeMaterial=allowedRecipeMaterials.has(requestedMaterial)?requestedMaterial:"minecraft:iron_ingot";
@@ -242,7 +244,7 @@ const server=http.createServer(async(req,res)=>{
       const iconStyle=new Set(["sword","crystal","orb"]).has(requestedIconStyle)?requestedIconStyle:"sword";
       const requestedColorTheme=String(body.colorTheme||"ice");
       const colorTheme=new Set(["ice","fire","emerald","void","gold"]).has(requestedColorTheme)?requestedColorTheme:"ice";
-      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeCount,iconStyle,colorTheme});
+      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeCount,durability,iconStyle,colorTheme});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
@@ -255,4 +257,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.8 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.9 działa: http://localhost:${port}`));
