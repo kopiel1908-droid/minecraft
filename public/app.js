@@ -6,7 +6,7 @@ description.addEventListener("input", () => {
   $("count").textContent = `${description.value.length} / 3000`;
 });
 $("type").addEventListener("change", () => {
-  button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : "Generuj dodatek ↓";
+  button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : "Generuj dodatek ↓";
 });
 button.addEventListener("click", async () => {
   const value = description.value.trim();
@@ -50,7 +50,7 @@ button.addEventListener("click", async () => {
     message.textContent = error.message || "Nieznany błąd.";
   } finally {
     button.disabled = false;
-    button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : "Generuj dodatek ↓";
+    button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : "Generuj dodatek ↓";
   }
 });
 async function checkStatus() {
