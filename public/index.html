@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0d10">
-  <title>AI Addon Studio 0.4.22</title>
+  <title>AI Addon Studio 0.4.23</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -15,9 +15,9 @@
       <span class="status"><span class="dot"></span> lokalnie</span>
     </header>
     <section class="hero">
-      <span class="tag">WERSJA 0.4.22</span>
+      <span class="tag">WERSJA 0.4.23</span>
       <h2>Twój pomysł.<br><em>Twój dodatek.</em></h2>
-      <p>Generator tworzy paczki zasobów, przedmioty i eksperymentalne bloki do Minecraft Bedrock. Tryb zestawu przygotowuje trzy warianty przedmiotu w jednym pliku .mcaddon. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
+      <p>Generator tworzy paczki zasobów, przedmioty z efektami po użyciu i eksperymentalne bloki do Minecraft Bedrock. Tryb zestawu przygotowuje trzy warianty przedmiotu w jednym pliku .mcaddon. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
     </section>
     <section class="panel">
       <p class="eyebrow">01 / KONCEPCJA</p>
@@ -58,6 +58,21 @@
         <option value="epic">Epicki</option>
       </select>
       <p class="hint">Ustawia kategorię rzadkości w definicji przedmiotu. Wygląd nazwy może zależeć od wersji gry.</p>
+      <label for="itemEffect">Efekt po użyciu przedmiotu</label>
+      <select id="itemEffect">
+        <option value="none">Brak efektu</option>
+        <option value="speed">Szybkość</option>
+        <option value="strength">Siła</option>
+        <option value="jump_boost">Wysoki skok</option>
+        <option value="regeneration">Regeneracja</option>
+        <option value="night_vision">Widzenie w ciemności</option>
+        <option value="resistance">Odporność</option>
+      </select>
+      <div class="settings-grid">
+        <div><label for="effectDuration">Czas efektu (sekundy)</label><input id="effectDuration" type="number" min="1" max="120" value="10"><p class="hint">Od 1 do 120 sekund</p></div>
+        <div><label for="effectAmplifier">Poziom efektu</label><input id="effectAmplifier" type="number" min="0" max="4" value="0"><p class="hint">0 = poziom I, 4 = poziom V</p></div>
+      </div>
+      <p class="hint">Wybrany przedmiot staje się używalnym magicznym jedzeniem i po użyciu nakłada wybrany efekt. To komponent Bedrock, który trzeba sprawdzić w grze.</p>
       <label for="durability">Trwałość przedmiotu (0 = bez ustawiania)</label>
       <input id="durability" type="number" min="0" max="1000" value="250">
       <p class="hint">Od 0 do 1000. Wartość 0 nie dodaje komponentu trwałości.</p>
@@ -113,7 +128,7 @@
     </section>
     <section class="panel details">
       <p class="eyebrow">02 / CO JEST GOTOWE</p>
-      <h3>Generator 0.4.22</h3>
+      <h3>Generator 0.4.23</h3>
       <ul>
         <li>Tworzy osobne manifesty Behavior Pack i Resource Pack.</li>
         <li>Dodaje definicję przedmiotu, wybieraną teksturę PNG pixel-art z paletą kolorów, obrażenia, trwałość, rzadkość, magiczny połysk i wielkość stosu i liczbę sztuk z receptury craftingu.</li>
