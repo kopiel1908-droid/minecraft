@@ -161,4 +161,54 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.equal(JSON.parse(bp.get(recipePath).toString("utf8"))["minecraft:recipe_shapeless"].result.count, 3);
   });
 
+  await t.test("rejects descriptions that are too short and unsupported project types", async () => {
+    const shortResponse = await fetch(`${baseUrl}/api/export`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description: "abc", type: "item" })
+    });
+    assert.equal(shortResponse.status, 400);
+    assert.match((await shortResponse.json()).error, /minimum 5/i);
+
+    const unsupportedResponse = await fetch(`${baseUrl}/api/export`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description: "Nowy mob testowy", type: "mob" })
+    });
+    assert.equal(unsupportedResponse.status, 400);
+    assert.match((await unsupportedResponse.json()).error, /przygotowaniu/i);
+  });
+
+  await t.test("clamps extreme item settings to safe supported ranges", async () => {
+    const response = await fetch(`${baseUrl}/api/export`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        description: "Test ograniczen parametrow",
+        type: "item",
+        damage: 999,
+        stackSize: 999,
+        durability: 99999,
+        recipeCount: 99,
+        rarity: "mythic",
+        recipeMaterial: "minecraft:command_block"
+      })
+    });
+    assert.equal(response.status, 200);
+    const addon = readZipEntries(Buffer.from(await response.arrayBuffer()));
+    const bpEntry = [...addon.entries()].find(([name]) => name.endsWith("-BP.mcpack"));
+    assert.ok(bpEntry);
+    const bp = readZipEntries(bpEntry[1]);
+    const itemPath = [...bp.keys()].find(name => name.startsWith("items/") && name.endsWith(".json"));
+    const item = JSON.parse(bp.get(itemPath).toString("utf8"))["minecraft:item"];
+    assert.equal(item.components["minecraft:damage"], 20);
+    assert.equal(item.components["minecraft:max_stack_size"], 64);
+    assert.equal(item.components["minecraft:durability"].max_durability, 1000);
+    assert.equal(item.components["minecraft:rarity"].value, "common");
+    const recipePath = [...bp.keys()].find(name => name.startsWith("recipes/") && name.endsWith(".json"));
+    const recipe = JSON.parse(bp.get(recipePath).toString("utf8"))["minecraft:recipe_shapeless"];
+    assert.equal(recipe.result.count, 4);
+    assert.ok(recipe.ingredients.some(ingredient => ingredient.item === "minecraft:iron_ingot"));
+  });
+
 });
