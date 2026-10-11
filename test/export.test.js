@@ -52,9 +52,9 @@ test("AI Addon Studio smoke tests", async (t) => {
       })
     });
 
-    assert.equal(response.status, 200, await response.text());
-    assert.match(response.headers.get("content-disposition") || "", /\.mcaddon/i);
     const bytes = Buffer.from(await response.arrayBuffer());
+    assert.equal(response.status, 200, bytes.toString("utf8").slice(0, 300));
+    assert.match(response.headers.get("content-disposition") || "", /\.mcaddon/i);
     assert.ok(bytes.length > 100, "Archiwum nie powinno być puste.");
     assert.equal(bytes[0], 0x50, "Archiwum ZIP powinno zaczynać się od P.");
     assert.equal(bytes[1], 0x4b, "Archiwum ZIP powinno zaczynać się od PK.");
