@@ -1,4 +1,4 @@
-# AI Addon Studio 0.4.15
+# AI Addon Studio 0.4.16
 
 Lokalny prototyp narzędzia do tworzenia paczek Minecraft Bedrock.
 
@@ -18,7 +18,7 @@ Następnie otwórz http://localhost:3000.
 - Eksport paczki zasobów jako `.mcpack`.
 - Osobne manifesty i zależność Behavior Pack od Resource Pack.
 - Trzy style tekstury PNG pixel-art: miecz, kryształ i magiczna kula; pięć palet kolorów: lodowy błękit, ogień, szmaragd, pustka i złoto.
-- Ustawiane obrażenia (1–20), trwałość (0–1000; 0 wyłącza komponent), rzadkość (zwykły, niezwykły, rzadki, epicki) i wielkość stosu (1–64).
+- Ustawiane obrażenia (1–20), trwałość (0–1000; 0 wyłącza komponent), rzadkość (zwykły, niezwykły, rzadki, epicki) i opcjonalny magiczny połysk i wielkość stosu (1–64).
 - Prosta receptura craftingu z wyborem składnika i liczbą otrzymywanych sztuk (1–4).
 - Eksperymentalny blok z teksturą PNG, mapowaniem atlasu terenu, definicją `minecraft:block`, ustawianą twardością, odpornością na wybuch i emisją światła (0–15), tarciem powierzchni (0–1) i dźwiękiem (kamień, drewno, szkło, trawa, metal) oraz eksportem `.mcaddon`.
 
@@ -28,6 +28,6 @@ To nie jest jeszcze generator AI: opis służy głównie jako nazwa, a grafika j
 
 ## Testowanie
 
-Uruchom automatyczne testy dymne poleceniem `npm test`. Sprawdzają endpoint statusu, archiwum `.mcaddon`, obecność paczek `.mcpack`, manifestów, tekstury, definicji przedmiotu wraz z trwałością i rzadkością i receptury z wybranym składnikiem oraz konfigurowalną liczbą sztuk. Styl ikony i paletę kolorów można wybrać w interfejsie. Testy sprawdzają też strukturę eksperymentalnego eksportu bloku i zapisaną emisję światła i tarcie powierzchni.
+Uruchom automatyczne testy dymne poleceniem `npm test`. Sprawdzają endpoint statusu, archiwum `.mcaddon`, obecność paczek `.mcpack`, manifestów, tekstury, definicji przedmiotu wraz z trwałością, rzadkością i połyskiem i receptury z wybranym składnikiem oraz konfigurowalną liczbą sztuk. Styl ikony i paletę kolorów można wybrać w interfejsie. Testy sprawdzają też strukturę eksperymentalnego eksportu bloku i zapisaną emisję światła i tarcie powierzchni.
 
 Po uruchomieniu sprawdź `http://localhost:3000/api/status`. Importuj wygenerowane paczki najpierw w kopii świata testowego.
