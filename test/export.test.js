@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.26");
+    assert.equal(status.version, "0.4.27");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("item_set"));
@@ -109,6 +109,8 @@ test("AI Addon Studio smoke tests", async (t) => {
     const bp = readZipEntries(bpEntry[1]);
     assert.ok(rp.has("manifest.json"), "Resource Pack nie ma manifest.json.");
     assert.ok(rp.has("textures/item_texture.json"), "Resource Pack nie ma atlasu tekstur.");
+    assert.ok([...rp.keys()].some(name => /^models\/entity\/.+\.geo\.json$/.test(name)), "Resource Pack nie ma geometrii modelu.");
+    assert.ok([...rp.keys()].some(name => /^attachables\/.+\.json$/.test(name)), "Resource Pack nie ma definicji attachable.");
     assert.ok([...rp.keys()].some(name => /^textures\/items\/.+\.png$/.test(name)), "Resource Pack nie ma tekstury PNG.");
     const textureName = [...rp.keys()].find(name => /^textures\/items\/.+\.png$/.test(name));
     const png = rp.get(textureName);
