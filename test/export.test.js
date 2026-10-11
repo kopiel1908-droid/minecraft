@@ -68,7 +68,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/status`);
     const status = await response.json();
     assert.equal(response.status, 200);
-    assert.equal(status.version, "0.4.23");
+    assert.equal(status.version, "0.4.24");
     assert.equal(status.ok, true);
     assert.ok(status.supportedTypes.includes("item"));
     assert.ok(status.supportedTypes.includes("item_set"));
@@ -133,7 +133,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     const response = await fetch(`${baseUrl}/api/export`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: "Eliksir szybkości", type: "item", itemEffect: "speed", effectDuration: 25, effectAmplifier: 2 })
+      body: JSON.stringify({ description: "Eliksir szybkości", type: "item", itemEffect: "speed", effectDuration: 25, effectAmplifier: 2, cooldownSeconds: 12 })
     });
     assert.equal(response.status, 200);
     const addon = readZipEntries(Buffer.from(await response.arrayBuffer()));
@@ -144,6 +144,7 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.deepEqual(components["minecraft:food"].effects, [{ name: "speed", chance: 1, duration: 25, amplifier: 2 }]);
     assert.equal(components["minecraft:food"].can_always_eat, true);
     assert.equal(components["minecraft:use_modifiers"].use_duration, 1.6);
+    assert.deepEqual(components["minecraft:cooldown"], { category: "studio:eliksir_szybkosci", duration: 12 });
   });
 
   await t.test("icon style and palette change the generated texture", async () => {
