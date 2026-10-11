@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0d10">
-  <title>AI Addon Studio 0.4.30</title>
+  <title>AI Addon Studio 0.4.31</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
       <span class="status"><span class="dot"></span> lokalnie</span>
     </header>
     <section class="hero">
-      <span class="tag">WERSJA 0.4.30</span>
+      <span class="tag">WERSJA 0.4.31</span>
       <h2>Twój pomysł.<br><em>Twój dodatek.</em></h2>
       <p>Generator tworzy paczki zasobów, przedmioty z efektami po użyciu i eksperymentalne bloki do Minecraft Bedrock. Tryb zestawu przygotowuje trzy warianty przedmiotu w jednym pliku .mcaddon. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
     </section>
@@ -46,6 +46,10 @@
       </div>
       <label for="description">Opisz swój pomysł</label>
       <textarea id="description" maxlength="3000" placeholder="Np. Mroźny miecz, który wygląda jak kryształ lodu..."></textarea>
+      <div class="match-panel">
+        <button type="button" id="matchIdea" class="preset-button">✨ Dopasuj ustawienia do opisu</button>
+        <p id="matchMessage" class="hint" role="status" aria-live="polite">Dopasowanie jest lokalne i regułowe. Ustawienia możesz sprawdzić i poprawić przed eksportem.</p>
+      </div>
       <div class="settings-grid">
         <div><label for="damage">Obrażenia przedmiotu</label><input id="damage" type="number" min="1" max="20" value="7"><p class="hint">Dla broni: 1–20</p></div>
         <div><label for="stackSize">Maks. liczba w stosie</label><input id="stackSize" type="number" min="1" max="64" value="1"><p class="hint">Od 1 do 64 sztuk</p></div>
@@ -159,7 +163,7 @@
     </section>
     <section class="panel details">
       <p class="eyebrow">02 / CO JEST GOTOWE</p>
-      <h3>Generator 0.4.30</h3>
+      <h3>Generator 0.4.31</h3>
       <ul>
         <li>Tworzy osobne manifesty Behavior Pack i Resource Pack.</li>
         <li>Dodaje definicję przedmiotu, wybieraną teksturę PNG pixel-art z paletą kolorów, obrażenia, trwałość, rzadkość, magiczny połysk i wielkość stosu i liczbę sztuk z receptury craftingu.</li>
