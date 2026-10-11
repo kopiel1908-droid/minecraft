@@ -125,6 +125,9 @@ function createResourcePack(root,packName,itemId,itemName,description,packUuid){
   return rp;
 }
 function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,options={}){
+  const recipeMaterial=options.recipeMaterial||"minecraft:iron_ingot";
+  const allowedRecipeMaterials=new Set(["minecraft:iron_ingot","minecraft:gold_ingot","minecraft:diamond","minecraft:emerald","minecraft:slime_ball","minecraft:amethyst_shard"]);
+  if(!allowedRecipeMaterials.has(recipeMaterial))throw new Error("Nieobsługiwany składnik receptury.");
   const bp=path.join(root,"behavior_pack"),packUuid=randomUUID();
   writeJson(path.join(bp,"manifest.json"),{
     format_version:2,
@@ -150,7 +153,7 @@ function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,opt
     "minecraft:recipe_shapeless":{
       description:{identifier:`studio:craft_${itemId}`},
       tags:["crafting_table"],
-      ingredients:[{item:"minecraft:iron_ingot"},{item:"minecraft:stick"}],
+      ingredients:[{item:recipeMaterial},{item:"minecraft:stick"}],
       result:{item:`studio:${itemId}`,count:1}
     }
   });
@@ -207,7 +210,10 @@ const server=http.createServer(async(req,res)=>{
       if(!new Set(["resource_pack","item","universal"]).has(type))return send(res,400,{error:"Ten rodzaj dodatku jest jeszcze w przygotowaniu. Działają przedmioty i paczki zasobów."});
       const damage=Math.max(1,Math.min(20,Math.round(Number(body.damage)||7)));
       const stackSize=Math.max(1,Math.min(64,Math.round(Number(body.stackSize)||1)));
-      result=await buildExport(description,type,{damage,stackSize});
+      const allowedRecipeMaterials=new Set(["minecraft:iron_ingot","minecraft:gold_ingot","minecraft:diamond","minecraft:emerald","minecraft:slime_ball","minecraft:amethyst_shard"]);
+      const requestedMaterial=String(body.recipeMaterial||"minecraft:iron_ingot");
+      const recipeMaterial=allowedRecipeMaterials.has(requestedMaterial)?requestedMaterial:"minecraft:iron_ingot";
+      result=await buildExport(description,type,{damage,stackSize,recipeMaterial});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
