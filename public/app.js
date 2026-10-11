@@ -2,6 +2,67 @@ const $ = id => document.getElementById(id);
 const description = $("description");
 const button = $("export");
 const message = $("message");
+
+function drawIconPreview() {
+  const canvas = $("iconPreview");
+  if (!canvas) return;
+  const context = canvas.getContext("2d");
+  if (!context) return;
+  const image = context.createImageData(16, 16);
+  const style = $("iconStyle").value;
+  const palettes = {
+    ice: [70, 175, 235],
+    fire: [235, 82, 45],
+    emerald: [45, 190, 115],
+    void: [160, 90, 230],
+    gold: [235, 185, 55]
+  };
+  const base = palettes[$("colorTheme").value] || palettes.ice;
+  const set = (x, y, color) => {
+    if (x < 0 || x >= 16 || y < 0 || y >= 16) return;
+    const i = (y * 16 + x) * 4;
+    image.data[i] = color[0];
+    image.data[i + 1] = color[1];
+    image.data[i + 2] = color[2];
+    image.data[i + 3] = 255;
+  };
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) set(x, y, [22, 29, 37]);
+  if (style === "rune") {
+    for (let i = 3; i <= 12; i++) { set(8, i, base); set(i, 8, base); }
+    for (const [x, y] of [[8,3],[7,4],[9,4],[6,5],[10,5],[5,6],[11,6],[4,8],[12,8],[5,10],[11,10],[6,11],[10,11],[7,12],[9,12]]) set(x, y, base);
+    for (const [x, y] of [[7,7],[8,7],[7,8],[8,8]]) set(x, y, [245,250,255]);
+    for (const [x, y] of [[7,13],[8,13],[7,14],[8,14]]) set(x, y, [240,196,100]);
+  } else if (style === "crystal") {
+    for (let y = 3; y <= 12; y++) {
+      const half = Math.floor((y <= 7 ? y - 2 : 13 - y) / 2);
+      for (let x = 8 - half; x <= 8 + half; x++) set(x, y, base);
+    }
+    for (let y = 4; y <= 8; y++) set(8, y, [220,248,255]);
+    for (let x = 6; x <= 10; x++) set(x, 13, [170,220,245]);
+    for (let x = 7; x <= 9; x++) set(x, 14, [170,220,245]);
+  } else if (style === "orb") {
+    for (let y = 3; y <= 12; y++) for (let x = 3; x <= 12; x++) {
+      const dx = x - 7.5, dy = y - 7.5;
+      if (dx * dx + dy * dy <= 23) set(x, y, base);
+    }
+    for (const [x, y] of [[5,5],[6,5],[5,6]]) set(x, y, [245,250,255]);
+    set(9, 10, [25,45,70]);
+    for (const [x, y] of [[7,13],[8,13],[7,14],[8,14]]) set(x, y, [240,196,100]);
+  } else {
+    for (let i = 0; i < 8; i++) { set(12-i, 2+i, [210,242,255]); set(11-i, 2+i, [120,207,244]); }
+    for (let i = 0; i < 4; i++) { set(5-i, 10+i, base); set(6-i, 10+i, base); }
+    for (let x = 3; x < 9; x++) set(x, 9, [240,196,100]);
+    set(3, 13, [190,140,90]); set(4, 14, [190,140,90]); set(2, 12, [190,140,90]);
+  }
+  context.putImageData(image, 0, 0);
+  const styleName = $("iconStyle").selectedOptions[0].textContent.trim();
+  const colorName = $("colorTheme").selectedOptions[0].textContent.trim();
+  $("previewLabel").textContent = `${styleName} • ${colorName}`;
+  canvas.setAttribute("aria-label", `Podgląd tekstury: ${styleName}, ${colorName}`);
+}
+$("iconStyle").addEventListener("change", drawIconPreview);
+$("colorTheme").addEventListener("change", drawIconPreview);
+drawIconPreview();
 description.addEventListener("input", () => {
   $("count").textContent = `${description.value.length} / 3000`;
 });
