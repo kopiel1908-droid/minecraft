@@ -25,7 +25,7 @@ button.addEventListener("click", async () => {
     const response = await fetch("/api/export", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: value, type: $("type").value, damage: Number($("damage").value), stackSize: Number($("stackSize").value), recipeMaterial: $("recipeMaterial").value })
+      body: JSON.stringify({ description: value, type: $("type").value, damage: Number($("damage").value), stackSize: Number($("stackSize").value), recipeMaterial: $("recipeMaterial").value, iconStyle: $("iconStyle").value })
     });
     if (!response.ok) {
       let error = {};
