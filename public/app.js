@@ -7,6 +7,7 @@ description.addEventListener("input", () => {
 });
 $("type").addEventListener("change", () => {
   button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : "Generuj dodatek ↓";
+  $("blockSettings").hidden = $("type").value !== "block";
 });
 button.addEventListener("click", async () => {
   const value = description.value.trim();
@@ -15,10 +16,12 @@ button.addEventListener("click", async () => {
     description.focus();
     return;
   }
-  const damage = Number($("damage").value), stackSize = Number($("stackSize").value), durability = Number($("durability").value);
+  const damage = Number($("damage").value), stackSize = Number($("stackSize").value), durability = Number($("durability").value), blockHardness = Number($("blockHardness").value), explosionResistance = Number($("explosionResistance").value);
   if (!Number.isInteger(damage) || damage < 1 || damage > 20) { message.textContent = "Obrażenia muszą być liczbą całkowitą od 1 do 20."; $("damage").focus(); return; }
   if (!Number.isInteger(stackSize) || stackSize < 1 || stackSize > 64) { message.textContent = "Wielkość stosu musi być liczbą całkowitą od 1 do 64."; $("stackSize").focus(); return; }
   if (!Number.isInteger(durability) || durability < 0 || durability > 1000) { message.textContent = "Trwałość musi być liczbą całkowitą od 0 do 1000."; $("durability").focus(); return; }
+  if (!Number.isFinite(blockHardness) || blockHardness < 0.1 || blockHardness > 10) { message.textContent = "Twardość bloku musi wynosić od 0,1 do 10."; $("blockHardness").focus(); return; }
+  if (!Number.isFinite(explosionResistance) || explosionResistance < 0 || explosionResistance > 1200) { message.textContent = "Odporność na wybuch musi wynosić od 0 do 1200."; $("explosionResistance").focus(); return; }
   button.disabled = true;
   button.textContent = "Tworzę paczkę…";
   message.textContent = "Generuję pliki Minecraft Bedrock…";
@@ -26,7 +29,7 @@ button.addEventListener("click", async () => {
     const response = await fetch("/api/export", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: value, type: $("type").value, damage: Number($("damage").value), stackSize: Number($("stackSize").value), durability: Number($("durability").value), rarity: $("rarity").value, recipeMaterial: $("recipeMaterial").value, recipeCount: Number($("recipeCount").value), iconStyle: $("iconStyle").value, colorTheme: $("colorTheme").value })
+      body: JSON.stringify({ description: value, type: $("type").value, damage: Number($("damage").value), stackSize: Number($("stackSize").value), durability: Number($("durability").value), rarity: $("rarity").value, recipeMaterial: $("recipeMaterial").value, recipeCount: Number($("recipeCount").value), iconStyle: $("iconStyle").value, colorTheme: $("colorTheme").value, blockHardness: Number($("blockHardness").value), explosionResistance: Number($("explosionResistance").value) })
     });
     if (!response.ok) {
       let error = {};
