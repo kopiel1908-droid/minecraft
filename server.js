@@ -195,6 +195,7 @@ function createResourcePack(root,packName,itemId,itemName,description,packUuid,i
   fs.writeFileSync(itemTextureFile,iconBytes);
   if(!fs.existsSync(itemTextureFile))throw new Error(`Nie udało się utworzyć tekstury przedmiotu: ${itemTextureFile}`);
   writeJson(path.join(rp,"models","entity",`${itemId}.geo.json`),makeItemModel(itemId,iconStyle));
+  writeJson(path.join(rp,"attachables",`${itemId}.json`),{format_version:"1.10.0","minecraft:attachable":{description:{identifier:`studio:${itemId}`,materials:{default:"entity_alphatest"},textures:{default:`textures/items/${itemId}`},geometry:{default:`geometry.${itemId}`},render_controllers:["controller.render.item_default"]}}});
   writeJson(path.join(rp,"textures","item_texture.json"),{
     resource_pack_name:packName,
     texture_name:"atlas.items",
