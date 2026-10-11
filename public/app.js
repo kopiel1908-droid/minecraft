@@ -123,7 +123,7 @@ document.querySelectorAll("[data-preset]").forEach(button => {
   });
 });
 function normalizeIdea(text) {
-  return text.toLocaleLowerCase("pl").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "");
+  return text.toLocaleLowerCase("pl").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 function matchIdeaToSettings() {
@@ -143,7 +143,7 @@ function matchIdeaToSettings() {
     changes.push(label);
   };
 
-  if (/\\b(ruda|blok|kamien|cegla|mur|podloze|klocek)\\b/.test(idea)) {
+  if (/\b(ruda|blok|kamien|cegla|mur|podloze|klocek)\b/.test(idea)) {
     set("type", "block", "typ: blok");
     set("blockTextureStyle", /ceg|mur|brick/.test(idea) ? "bricks" : /metal|stal|zelaz/.test(idea) ? "metal" : /kryszt|ametyst|diament/.test(idea) ? "crystal" : "ore", "tekstura bloku");
     set("blockHardness", /obsydian|tward/.test(idea) ? 8 : 3, "twardość");
@@ -178,7 +178,7 @@ function matchIdeaToSettings() {
   } else if (/truj|jad|toksy|venom|poison/.test(idea)) {
     set("colorTheme", "emerald", "szmaragdowa paleta");
     set("iconStyle", "orb", "ikona kuli");
-    set("itemEffect", "resistance", "efekt: odporność (bezpieczny zamiennik trucizny)");
+    $("matchMessage").textContent = "Wykryto motyw trucizny. Bedrock nie ma tu bezpośredniego efektu trucizny w tym generatorze, więc wybierz efekt ręcznie zamiast podstawiać inny.";
   } else if (/pustk|cien|mrok|kosmicz|void|relikt|runa/.test(idea)) {
     set("colorTheme", "void", "paleta pustki");
     set("iconStyle", "rune", "ikona runiczna");
