@@ -6,7 +6,7 @@ description.addEventListener("input", () => {
   $("count").textContent = `${description.value.length} / 3000`;
 });
 $("type").addEventListener("change", () => {
-  button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : "Generuj dodatek ↓";
+  button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : $("type").value === "item_set" ? "Generuj zestaw 3 przedmiotów ↓" : "Generuj dodatek ↓";
   $("blockSettings").hidden = $("type").value !== "block";
 });
 button.addEventListener("click", async () => {
@@ -55,7 +55,7 @@ button.addEventListener("click", async () => {
     message.textContent = error.message || "Nieznany błąd.";
   } finally {
     button.disabled = false;
-    button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : "Generuj dodatek ↓";
+    button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : $("type").value === "item_set" ? "Generuj zestaw 3 przedmiotów ↓" : "Generuj dodatek ↓";
   }
 });
 async function checkStatus() {
