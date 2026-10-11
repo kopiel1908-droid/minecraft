@@ -126,6 +126,16 @@ function makeIcon(seed,style="sword",colorTheme="ice"){
   const header=Buffer.alloc(13);header.writeUInt32BE(width,0);header.writeUInt32BE(height,4);header[8]=8;header[9]=6;
   return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),pngChunk("IHDR",header),pngChunk("IDAT",zlib.deflateSync(raw)),pngChunk("IEND",Buffer.alloc(0))]);
 }
+function makeItemModel(itemId,style="sword"){
+  const cuboids={
+    sword:[{origin:[7,0,7],size:[2,12,2],uv:[0,0]},{origin:[5,10,7],size:[6,2,2],uv:[0,0]},{origin:[7,12,7],size:[2,3,2],uv:[0,0]}],
+    crystal:[{origin:[5,2,5],size:[6,10,6],uv:[0,0]},{origin:[6,0,6],size:[4,2,4],uv:[0,0]},{origin:[6,12,6],size:[4,3,4],uv:[0,0]}],
+    orb:[{origin:[4,4,4],size:[8,8,8],uv:[0,0]},{origin:[6,2,6],size:[4,2,4],uv:[0,0]},{origin:[6,12,6],size:[4,2,4],uv:[0,0]}],
+    rune:[{origin:[5,3,6],size:[6,9,4],uv:[0,0]},{origin:[7,1,6],size:[2,2,4],uv:[0,0]},{origin:[7,12,6],size:[2,2,4],uv:[0,0]}]
+  };
+  const elements=(cuboids[style]||cuboids.sword).map(c=>({from:c.origin,to:c.origin.map((v,i)=>v+c.size[i]),faces:{north:{uv:[0,0],texture:"#layer0"},east:{uv:[0,0],texture:"#layer0"},south:{uv:[0,0],texture:"#layer0"},west:{uv:[0,0],texture:"#layer0"},up:{uv:[0,0],texture:"#layer0"},down:{uv:[0,0],texture:"#layer0"}}}));
+  return {format_version:"1.16.0", "minecraft:geometry":[{description:{identifier:"geometry."+itemId,texture_width:16,texture_height:16,visible_bounds_width:2,visible_bounds_height:2,visible_bounds_offset:[0,1,0]},bones:[{name:"root",pivot:[8,8,8],cubes:elements}]}]};
+}
 function makeBlockTexture(seed,style="crystal",colorTheme="ice"){
   const width=16,height=16,pixels=Buffer.alloc(width*height*4);
   const palettes={ice:[70,175,235],fire:[235,82,45],emerald:[45,190,115],void:[160,90,230],gold:[235,185,55]};
@@ -184,6 +194,7 @@ function createResourcePack(root,packName,itemId,itemName,description,packUuid,i
   fs.mkdirSync(itemTexturesDir,{recursive:true});
   fs.writeFileSync(itemTextureFile,iconBytes);
   if(!fs.existsSync(itemTextureFile))throw new Error(`Nie udało się utworzyć tekstury przedmiotu: ${itemTextureFile}`);
+  writeJson(path.join(rp,"models","entity",`${itemId}.geo.json`),makeItemModel(itemId,iconStyle));
   writeJson(path.join(rp,"textures","item_texture.json"),{
     resource_pack_name:packName,
     texture_name:"atlas.items",
@@ -346,7 +357,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.26",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.27",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -417,4 +428,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.26 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.27 działa: http://localhost:${port}`));
