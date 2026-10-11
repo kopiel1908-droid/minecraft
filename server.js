@@ -251,7 +251,39 @@ function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,opt
   fs.writeFileSync(path.join(bp,"texts","README.txt"),`Pomysł: ${description}\nPrzedmiot: studio:${itemId}\n\nWłącz Behavior Pack i Resource Pack w ustawieniach świata.\n`);
   return bp;
 }
+async function buildItemSetExport(description,options={}){
+  const baseName=displayName(description),basePackName=safeName(baseName),root=path.join(os.tmpdir(),"ai-addon-set-"+randomUUID());
+  const container=path.join(root,"addon_container"),temporary=[];
+  fs.mkdirSync(container,{recursive:true});
+  const variants=[
+    {suffix:"Odlamek",label:"Odłamek",style:"crystal",theme:options.colorTheme||"ice",damage:4,rarity:"uncommon"},
+    {suffix:"Rdzen",label:"Rdzeń",style:"orb",theme:"void",damage:7,rarity:"rare"},
+    {suffix:"Relikt",label:"Relikt",style:"rune",theme:"gold",damage:10,rarity:"epic"}
+  ];
+  try{
+    for(const variant of variants){
+      const itemName=(baseName+" "+variant.label).slice(0,40);
+      const itemId=safeName(baseName+"_"+variant.suffix).slice(0,28)||("set_"+variant.suffix.toLowerCase());
+      const packName=safeName(baseName+"_"+variant.suffix);
+      const itemRoot=path.join(root,variant.suffix);
+      fs.mkdirSync(itemRoot,{recursive:true});
+      const rpUuid=randomUUID();
+      const itemOptions={...options,damage:variant.damage,rarity:variant.rarity,iconStyle:variant.style,colorTheme:variant.theme,stackSize:1,handEquipped:true};
+      createResourcePack(itemRoot,packName,itemId,itemName,description,rpUuid,variant.style,variant.theme);
+      createBehaviorPack(itemRoot,packName,itemId,itemName,description,rpUuid,itemOptions);
+      const rpFile=path.join(root,packName+"-RP.mcpack"),bpFile=path.join(root,packName+"-BP.mcpack");
+      await zipDirectory(path.join(itemRoot,"resource_pack"),rpFile);
+      await zipDirectory(path.join(itemRoot,"behavior_pack"),bpFile);
+      fs.copyFileSync(rpFile,path.join(container,packName+"-RP.mcpack"));
+      fs.copyFileSync(bpFile,path.join(container,packName+"-BP.mcpack"));
+    }
+    const output=path.join(os.tmpdir(),basePackName+"-set-"+randomUUID()+".mcaddon");
+    await zipDirectory(container,output);temporary.push(output);
+    return {output,filename:basePackName+"-zestaw-3-przedmiotow.mcaddon",contentType:"application/octet-stream",cleanup:()=>{fs.rmSync(root,{recursive:true,force:true});for(const f of temporary)fs.rmSync(f,{force:true});}};
+  }catch(error){fs.rmSync(root,{recursive:true,force:true});for(const f of temporary)fs.rmSync(f,{force:true});throw error;}
+}
 async function buildExport(description,type,options={}){
+  if(type==="item_set")return buildItemSetExport(description,options);
   const itemName=displayName(description),itemId=safeName(itemName).slice(0,28)||"custom_item";
   if(type==="block"){
     const blockId=itemId.slice(0,24)||"custom_block",packName=safeName(itemName),root=path.join(os.tmpdir(),"ai-addon-"+randomUUID());
@@ -302,14 +334,14 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.21",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.22",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
       const body=await readBody(req),description=String(body.description||"").trim(),type=String(body.type||"universal");
       if(description.length<5)return send(res,400,{error:"Wpisz opis (minimum 5 znaków)."});
       if(description.length>3000)return send(res,400,{error:"Opis może mieć maksymalnie 3000 znaków."});
-      if(!new Set(["resource_pack","item","universal","block"]).has(type))return send(res,400,{error:"Ten rodzaj dodatku jest jeszcze w przygotowaniu. Działają przedmioty, bloki i paczki zasobów."});
+      if(!new Set(["resource_pack","item","item_set","universal","block"]).has(type))return send(res,400,{error:"Ten rodzaj dodatku jest jeszcze w przygotowaniu. Działają przedmioty, bloki i paczki zasobów."});
       const damage=Math.max(1,Math.min(20,Math.round(Number(body.damage)||7)));
       const stackSize=Math.max(1,Math.min(64,Math.round(Number(body.stackSize)||1)));
       const recipeCount=Math.max(1,Math.min(4,Math.round(Number(body.recipeCount)||1)));
@@ -360,4 +392,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.21 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.22 działa: http://localhost:${port}`));
