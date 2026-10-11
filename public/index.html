@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0d10">
-  <title>AI Addon Studio 0.4.29</title>
+  <title>AI Addon Studio 0.4.30</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
       <span class="status"><span class="dot"></span> lokalnie</span>
     </header>
     <section class="hero">
-      <span class="tag">WERSJA 0.4.29</span>
+      <span class="tag">WERSJA 0.4.30</span>
       <h2>Twój pomysł.<br><em>Twój dodatek.</em></h2>
       <p>Generator tworzy paczki zasobów, przedmioty z efektami po użyciu i eksperymentalne bloki do Minecraft Bedrock. Tryb zestawu przygotowuje trzy warianty przedmiotu w jednym pliku .mcaddon. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
     </section>
@@ -33,6 +33,17 @@
         <option value="vehicle" disabled>Pojazd lub maszyna (w przygotowaniu)</option>
         <option value="world" disabled>Mapa / świat (w przygotowaniu)</option>
       </select>
+      <div class="preset-panel">
+        <p class="eyebrow">SZYBKI START</p>
+        <p class="hint">Wybierz szablon, żeby od razu ustawić przykładowe parametry. Wszystko możesz później zmienić.</p>
+        <div class="preset-buttons">
+          <button type="button" class="preset-button" data-preset="weapon">⚔️ Kryształowy miecz</button>
+          <button type="button" class="preset-button" data-preset="potion">🧪 Eliksir regeneracji</button>
+          <button type="button" class="preset-button" data-preset="relic">✨ Epicki relikt</button>
+          <button type="button" class="preset-button" data-preset="block">💎 Świecąca ruda</button>
+        </div>
+        <p id="presetMessage" class="hint" role="status" aria-live="polite">Szablon tylko ustawia formularz. Nic nie zostanie wygenerowane, dopóki nie klikniesz przycisku eksportu.</p>
+      </div>
       <label for="description">Opisz swój pomysł</label>
       <textarea id="description" maxlength="3000" placeholder="Np. Mroźny miecz, który wygląda jak kryształ lodu..."></textarea>
       <div class="settings-grid">
@@ -148,7 +159,7 @@
     </section>
     <section class="panel details">
       <p class="eyebrow">02 / CO JEST GOTOWE</p>
-      <h3>Generator 0.4.29</h3>
+      <h3>Generator 0.4.30</h3>
       <ul>
         <li>Tworzy osobne manifesty Behavior Pack i Resource Pack.</li>
         <li>Dodaje definicję przedmiotu, wybieraną teksturę PNG pixel-art z paletą kolorów, obrażenia, trwałość, rzadkość, magiczny połysk i wielkość stosu i liczbę sztuk z receptury craftingu.</li>
