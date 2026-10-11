@@ -242,15 +242,11 @@ function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,opt
       }
     }
   });
-  writeJson(path.join(bp,"recipes",`${itemId}.json`),{
-    format_version:"1.20.10",
-    "minecraft:recipe_shapeless":{
-      description:{identifier:`studio:craft_${itemId}`},
-      tags:["crafting_table"],
-      ingredients:[{item:recipeMaterial},{item:recipeTool}],
-      result:{item:`studio:${itemId}`,count:options.recipeCount??1}
-    }
-  });
+  const recipeDescription={description:{identifier:`studio:craft_${itemId}`},tags:["crafting_table"],result:{item:`studio:${itemId}`,count:options.recipeCount??1}};
+  const recipe=options.recipeType==="shaped"
+    ? {format_version:"1.20.10","minecraft:recipe_shaped":{...recipeDescription,pattern:["AB"],key:{A:{item:recipeMaterial},B:{item:recipeTool}}}}
+    : {format_version:"1.20.10","minecraft:recipe_shapeless":{...recipeDescription,ingredients:[{item:recipeMaterial},{item:recipeTool}]}};
+  writeJson(path.join(bp,"recipes",`${itemId}.json`),recipe);
   fs.mkdirSync(path.join(bp,"texts"),{recursive:true});
   fs.writeFileSync(path.join(bp,"texts","README.txt"),`Pomysł: ${description}\nPrzedmiot: studio:${itemId}\n\nWłącz Behavior Pack i Resource Pack w ustawieniach świata.\n`);
   return bp;
@@ -306,7 +302,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.19",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.20",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -324,6 +320,8 @@ const server=http.createServer(async(req,res)=>{
       const allowedRecipeMaterials=new Set(["minecraft:iron_ingot","minecraft:gold_ingot","minecraft:diamond","minecraft:emerald","minecraft:slime_ball","minecraft:amethyst_shard"]);
       const requestedMaterial=String(body.recipeMaterial||"minecraft:iron_ingot");
       const recipeMaterial=allowedRecipeMaterials.has(requestedMaterial)?requestedMaterial:"minecraft:iron_ingot";
+      const requestedRecipeType=String(body.recipeType||"shapeless");
+      const recipeType=requestedRecipeType==="shaped"?"shaped":"shapeless";
       const allowedRecipeTools=new Set(["minecraft:stick","minecraft:blaze_rod","minecraft:bone","minecraft:amethyst_shard"]);
       const requestedRecipeTool=String(body.recipeTool||"minecraft:stick");
       const recipeTool=allowedRecipeTools.has(requestedRecipeTool)?requestedRecipeTool:"minecraft:stick";
@@ -345,7 +343,7 @@ const server=http.createServer(async(req,res)=>{
       const requestedBlockTextureStyle=String(body.blockTextureStyle||"crystal");
       const blockTextureStyle=allowedBlockTextureStyles.has(requestedBlockTextureStyle)?requestedBlockTextureStyle:"crystal";
       const glint=body.glint===true;
-      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeTool,recipeCount,durability,rarity,glint,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound,blockTextureStyle});
+      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeTool,recipeType,recipeCount,durability,rarity,glint,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound,blockTextureStyle});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
@@ -358,4 +356,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.19 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.20 działa: http://localhost:${port}`));
