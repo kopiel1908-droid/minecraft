@@ -133,7 +133,13 @@ function makeItemModel(itemId,style="sword"){
     orb:[{origin:[4,4,4],size:[8,8,8],uv:[0,0]},{origin:[6,2,6],size:[4,2,4],uv:[0,0]},{origin:[6,12,6],size:[4,2,4],uv:[0,0]}],
     rune:[{origin:[5,3,6],size:[6,9,4],uv:[0,0]},{origin:[7,1,6],size:[2,2,4],uv:[0,0]},{origin:[7,12,6],size:[2,2,4],uv:[0,0]}]
   };
-  const elements=(cuboids[style]||cuboids.sword).map(c=>({from:c.origin,to:c.origin.map((v,i)=>v+c.size[i]),faces:{north:{uv:[0,0],texture:"#layer0"},east:{uv:[0,0],texture:"#layer0"},south:{uv:[0,0],texture:"#layer0"},west:{uv:[0,0],texture:"#layer0"},up:{uv:[0,0],texture:"#layer0"},down:{uv:[0,0],texture:"#layer0"}}}));
+  // Bedrock geometry uses per-face UV coordinates, not Java/Blockbench "#layer0" texture references.
+  const faceUv={uv:[0,0],uv_size:[16,16]};
+  const elements=(cuboids[style]||cuboids.sword).map(c=>({
+    origin:c.origin,
+    size:c.size,
+    uv:{north:{...faceUv},east:{...faceUv},south:{...faceUv},west:{...faceUv},up:{...faceUv},down:{...faceUv}}
+  }));
   return {format_version:"1.16.0", "minecraft:geometry":[{description:{identifier:"geometry."+itemId,texture_width:16,texture_height:16,visible_bounds_width:2,visible_bounds_height:2,visible_bounds_offset:[0,1,0]},bones:[{name:"root",pivot:[8,8,8],cubes:elements}]}]};
 }
 function makeBlockTexture(seed,style="crystal",colorTheme="ice"){
@@ -358,7 +364,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.27",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.28",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -429,4 +435,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.27 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.28 działa: http://localhost:${port}`));
