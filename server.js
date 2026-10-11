@@ -94,11 +94,28 @@ function makeIcon(seed,style="sword",colorTheme="ice"){
   const base=palettes[colorTheme]||palettes.ice;
   const set=(x,y,color)=>{if(x<0||x>=width||y<0||y>=height)return;const i=(y*width+x)*4;pixels[i]=color[0];pixels[i+1]=color[1];pixels[i+2]=color[2];pixels[i+3]=255;};
   for(let y=0;y<height;y++)for(let x=0;x<width;x++)set(x,y,[22,29,37]);
-  // Pixel-art sword icon: diagonal blade, guard and handle.
-  for(let i=0;i<8;i++){set(12-i,2+i,[210,242,255]);set(11-i,2+i,[120,207,244]);}
-  for(let i=0;i<4;i++){set(5-i,10+i,[base[0],base[1],base[2]]);set(6-i,10+i,[base[0],base[1],base[2]]);}
-  for(let x=3;x<9;x++)set(x,9,[240,196,100]);
-  set(3,13,[190,140,90]);set(4,14,[190,140,90]);set(2,12,[190,140,90]);
+  if(style==="crystal"){
+    for(let y=3;y<=12;y++){
+      const half=Math.floor((y<=7?y-2:13-y)/2);
+      for(let x=8-half;x<=8+half;x++)set(x,y,[base[0],base[1],base[2]]);
+    }
+    for(let y=4;y<=8;y++)set(8,y,[220,248,255]);
+    for(let x=6;x<=10;x++)set(x,13,[170,220,245]);
+    set(7,14,[170,220,245]);set(8,14,[170,220,245]);set(9,14,[170,220,245]);
+  } else if(style==="orb"){
+    for(let y=3;y<=12;y++)for(let x=3;x<=12;x++){
+      const dx=x-7.5,dy=y-7.5;
+      if(dx*dx+dy*dy<=23)set(x,y,[base[0],base[1],base[2]]);
+    }
+    set(5,5,[245,250,255]);set(6,5,[245,250,255]);set(5,6,[245,250,255]);
+    set(9,10,[25,45,70]);set(7,13,[240,196,100]);set(8,13,[240,196,100]);
+    set(7,14,[240,196,100]);set(8,14,[240,196,100]);
+  } else {
+    for(let i=0;i<8;i++){set(12-i,2+i,[210,242,255]);set(11-i,2+i,[120,207,244]);}
+    for(let i=0;i<4;i++){set(5-i,10+i,[base[0],base[1],base[2]]);set(6-i,10+i,[base[0],base[1],base[2]]);}
+    for(let x=3;x<9;x++)set(x,9,[240,196,100]);
+    set(3,13,[190,140,90]);set(4,14,[190,140,90]);set(2,12,[190,140,90]);
+  }
   const raw=Buffer.alloc(height*(1+width*4));
   for(let y=0;y<height;y++){raw[y*(1+width*4)]=0;pixels.copy(raw,y*(1+width*4)+1,y*width*4,(y+1)*width*4);}
   const header=Buffer.alloc(13);header.writeUInt32BE(width,0);header.writeUInt32BE(height,4);header[8]=8;header[9]=6;
@@ -207,7 +224,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.6",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.7",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -220,7 +237,11 @@ const server=http.createServer(async(req,res)=>{
       const allowedRecipeMaterials=new Set(["minecraft:iron_ingot","minecraft:gold_ingot","minecraft:diamond","minecraft:emerald","minecraft:slime_ball","minecraft:amethyst_shard"]);
       const requestedMaterial=String(body.recipeMaterial||"minecraft:iron_ingot");
       const recipeMaterial=allowedRecipeMaterials.has(requestedMaterial)?requestedMaterial:"minecraft:iron_ingot";
-      result=await buildExport(description,type,{damage,stackSize,recipeMaterial});
+      const requestedIconStyle=String(body.iconStyle||"sword");
+      const iconStyle=new Set(["sword","crystal","orb"]).has(requestedIconStyle)?requestedIconStyle:"sword";
+      const requestedColorTheme=String(body.colorTheme||"ice");
+      const colorTheme=new Set(["ice","fire","emerald","void","gold"]).has(requestedColorTheme)?requestedColorTheme:"ice";
+      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,iconStyle,colorTheme});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
@@ -233,4 +254,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.6 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.7 działa: http://localhost:${port}`));
