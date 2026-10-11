@@ -1,4 +1,4 @@
-# AI Addon Studio 0.4.27
+# AI Addon Studio 0.4.28
 
 Lokalny prototyp narzędzia do tworzenia paczek Minecraft Bedrock.
 
@@ -19,7 +19,7 @@ Następnie otwórz http://localhost:3000.
 - Tryb zestawu: generuje trzy przedmioty tematyczne (odłamek, rdzeń i relikt), każdy z własną ikoną, parametrami, recepturą i manifestami, zebrane w jednym pliku `.mcaddon`.
 - Osobne manifesty i zależność Behavior Pack od Resource Pack.
 - Cztery style tekstury PNG pixel-art: miecz, kryształ, magiczna kula i runiczny talizman; pięć palet kolorów: lodowy błękit, ogień, szmaragd, pustka i złoto.
-- Eksperymentalne modele geometrii Bedrock dla czterech stylów przedmiotów, wraz z plikami attachable łączącymi geometrię z teksturą. Modele są prototypowe i wymagają testu w grze; nie zastępują jeszcze pełnego edytora modeli 3D.
+- Eksperymentalne modele geometrii Bedrock dla czterech stylów przedmiotów, wraz z plikami attachable i mapowaniem UV na sześciu ścianach brył. Testy sprawdzają strukturę geometrii i referencje tekstur, ale wyświetlanie modelu w grze nadal wymaga testu w Minecraft Bedrock; nie jest to jeszcze pełny edytor modeli 3D.
 - Efekt po użyciu: szybkość, siła, skok, regeneracja, widzenie w ciemności lub odporność; czas 1–120 sekund i poziom I–V. Przedmiot z efektem otrzymuje komponenty konsumpcji Bedrock.
 - Opcjonalna blokada ponownego użycia przedmiotu (cooldown) od 1 do 60 sekund; 0 wyłącza blokadę. Wymaga testu zgodności w grze.
 - Ustawiana możliwość zaklinania (0–30) i typ slotu zaklinania (np. miecz, łuk, element zbroi, narzędzia). Wartość 0 pomija komponent `minecraft:enchantable`; sprawdź zgodność slotu w docelowej wersji Bedrock.
@@ -34,6 +34,6 @@ To nie jest jeszcze generator AI: opis służy głównie jako nazwa, a grafika j
 
 ## Testowanie
 
-Uruchom automatyczne testy dymne poleceniem `npm test`. Sprawdzają endpoint statusu, archiwum `.mcaddon`, obecność paczek `.mcpack`, manifestów, tekstury, definicji przedmiotu wraz z trwałością, rzadkością i połyskiem i receptury z wybieranymi składnikami, trybem shapeless/shaped i liczbą sztuk, a także efekt użycia przedmiotu i ustawienia kategorii ekwipunku oraz sposobu trzymania przedmiotu. Styl ikony (miecz, kryształ, kula, talizman) i paletę kolorów można wybrać w interfejsie. Testy sprawdzają też strukturę eksperymentalnego eksportu bloku, zapisaną emisję światła i tarcie powierzchni oraz to, że cztery style tekstury bloku tworzą różne pliki PNG.
+Uruchom automatyczne testy dymne poleceniem `npm test`. Sprawdzają endpoint statusu, archiwum `.mcaddon`, obecność paczek `.mcpack`, manifestów, tekstury, definicji przedmiotu wraz z trwałością, rzadkością i połyskiem i receptury z wybieranymi składnikami, trybem shapeless/shaped i liczbą sztuk, a także efekt użycia przedmiotu i ustawienia kategorii ekwipunku oraz sposobu trzymania przedmiotu. Styl ikony (miecz, kryształ, kula, talizman) i paletę kolorów można wybrać w interfejsie. Testy sprawdzają też strukturę geometrii modeli Bedrock, mapowanie UV i referencje attachable, strukturę eksperymentalnego eksportu bloku, zapisaną emisję światła i tarcie powierzchni oraz to, że cztery style tekstury bloku tworzą różne pliki PNG.
 
 Po uruchomieniu sprawdź `http://localhost:3000/api/status`. Importuj wygenerowane paczki najpierw w kopii świata testowego.
