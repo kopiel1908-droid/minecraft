@@ -154,14 +154,14 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.0",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","block","resource_pack","universal"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.0",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
       const body=await readBody(req),description=String(body.description||"").trim(),type=String(body.type||"universal");
       if(description.length<5)return send(res,400,{error:"Wpisz opis (minimum 5 znaków)."});
       if(description.length>3000)return send(res,400,{error:"Opis może mieć maksymalnie 3000 znaków."});
-      if(!new Set(["resource_pack","item","block","universal"]).has(type))return send(res,400,{error:"Ten rodzaj dodatku jest jeszcze w przygotowaniu. Działają przedmioty, proste bloki i paczki zasobów."});
+      if(!new Set(["resource_pack","item","universal"]).has(type))return send(res,400,{error:"Ten rodzaj dodatku jest jeszcze w przygotowaniu. Działają przedmioty i paczki zasobów."});
       result=await buildExport(description,type);
       const data=fs.readFileSync(result.output);
       result.cleanup();
