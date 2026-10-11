@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0d10">
-  <title>AI Addon Studio 0.4.19</title>
+  <title>AI Addon Studio 0.4.20</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
       <span class="status"><span class="dot"></span> lokalnie</span>
     </header>
     <section class="hero">
-      <span class="tag">WERSJA 0.4.19</span>
+      <span class="tag">WERSJA 0.4.20</span>
       <h2>Twój pomysł.<br><em>Twój dodatek.</em></h2>
       <p>Generator tworzy paczkę zasobów, prototyp przedmiotu albo eksperymentalny blok do Minecraft Bedrock. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
     </section>
@@ -84,6 +84,12 @@
         <option value="minecraft:amethyst_shard">Odłamek ametystu</option>
       </select>
       <p class="hint">Dobierz drugi składnik do charakteru przedmiotu. To nadal receptura bez układu 3×3.</p>
+      <label for="recipeType">Rodzaj receptury</label>
+      <select id="recipeType">
+        <option value="shapeless">Bez układu (składniki w dowolnych polach)</option>
+        <option value="shaped">Z układem (składniki obok siebie)</option>
+      </select>
+      <p class="hint">Receptura z układem wymaga położenia głównego i drugiego składnika obok siebie w stole rzemieślniczym.</p>
       <label for="recipeCount">Ile sztuk daje crafting?</label>
       <select id="recipeCount">
         <option value="1">1 sztuka</option>
@@ -97,7 +103,7 @@
     </section>
     <section class="panel details">
       <p class="eyebrow">02 / CO JEST GOTOWE</p>
-      <h3>Generator 0.4.19</h3>
+      <h3>Generator 0.4.20</h3>
       <ul>
         <li>Tworzy osobne manifesty Behavior Pack i Resource Pack.</li>
         <li>Dodaje definicję przedmiotu, wybieraną teksturę PNG pixel-art z paletą kolorów, obrażenia, trwałość, rzadkość, magiczny połysk i wielkość stosu i liczbę sztuk z receptury craftingu.</li>
