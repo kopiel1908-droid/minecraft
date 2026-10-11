@@ -229,12 +229,12 @@ function createBehaviorPack(root,packName,itemId,itemName,description,rpUuid,opt
   writeJson(path.join(bp,"items",`${itemId}.json`),{
     format_version:"1.20.50",
     "minecraft:item":{
-      description:{identifier:`studio:${itemId}`,menu_category:{category:"equipment"}},
+      description:{identifier:`studio:${itemId}`,menu_category:{category:options.itemCategory??"equipment"}},
       components:{
         "minecraft:icon":{texture:itemId},
         "minecraft:display_name":{value:itemName},
         "minecraft:max_stack_size":options.stackSize??1,
-        "minecraft:hand_equipped":true,
+        "minecraft:hand_equipped":options.handEquipped!==false,
         "minecraft:damage":options.damage??7,
         "minecraft:rarity":{value:options.rarity??"common"},
         "minecraft:glint":options.glint===true,
@@ -302,7 +302,7 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.20",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.21",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","resource_pack","universal","block"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
@@ -320,6 +320,10 @@ const server=http.createServer(async(req,res)=>{
       const allowedRecipeMaterials=new Set(["minecraft:iron_ingot","minecraft:gold_ingot","minecraft:diamond","minecraft:emerald","minecraft:slime_ball","minecraft:amethyst_shard"]);
       const requestedMaterial=String(body.recipeMaterial||"minecraft:iron_ingot");
       const recipeMaterial=allowedRecipeMaterials.has(requestedMaterial)?requestedMaterial:"minecraft:iron_ingot";
+      const allowedItemCategories=new Set(["equipment","nature","construction","items"]);
+      const requestedItemCategory=String(body.itemCategory||"equipment");
+      const itemCategory=allowedItemCategories.has(requestedItemCategory)?requestedItemCategory:"equipment";
+      const handEquipped=body.handEquipped===true;
       const requestedRecipeType=String(body.recipeType||"shapeless");
       const recipeType=requestedRecipeType==="shaped"?"shaped":"shapeless";
       const allowedRecipeTools=new Set(["minecraft:stick","minecraft:blaze_rod","minecraft:bone","minecraft:amethyst_shard"]);
@@ -343,7 +347,7 @@ const server=http.createServer(async(req,res)=>{
       const requestedBlockTextureStyle=String(body.blockTextureStyle||"crystal");
       const blockTextureStyle=allowedBlockTextureStyles.has(requestedBlockTextureStyle)?requestedBlockTextureStyle:"crystal";
       const glint=body.glint===true;
-      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeTool,recipeType,recipeCount,durability,rarity,glint,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound,blockTextureStyle});
+      result=await buildExport(description,type,{damage,stackSize,recipeMaterial,recipeTool,recipeType,recipeCount,durability,rarity,glint,itemCategory,handEquipped,iconStyle,colorTheme,blockHardness,explosionResistance,blockLight,blockFriction,blockSound,blockTextureStyle});
       const data=fs.readFileSync(result.output);
       result.cleanup();
       res.writeHead(200,{"Content-Type":result.contentType,"Content-Disposition":`attachment; filename="${result.filename}"`,"Content-Length":data.length,"X-Content-Type-Options":"nosniff"});
@@ -356,4 +360,4 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="GET"||req.method==="HEAD")return sendStatic(req,res);
   return send(res,405,{error:"Method not allowed"});
 });
-server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.20 działa: http://localhost:${port}`));
+server.listen(port,"127.0.0.1",()=>console.log(`AI Addon Studio 0.4.21 działa: http://localhost:${port}`));
