@@ -21,7 +21,8 @@ function syncEditionMode() {
 }
 $("edition")?.addEventListener("change", syncEditionMode);
 syncEditionMode();
-\nfunction drawIconPreview() {
+
+function drawIconPreview() {
   const canvas = $("iconPreview");
   if (!canvas) return;
   const context = canvas.getContext("2d");
