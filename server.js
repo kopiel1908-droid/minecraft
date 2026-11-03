@@ -430,6 +430,8 @@ const server=http.createServer(async(req,res)=>{
     try{
       const body=await readBody(req),description=String(body.description||"").trim(),type=String(body.type||"universal");
       if(type==="java_item"){
+        if(description.length<5)return send(res,400,{error:"Wpisz opis (minimum 5 znaków)."});
+        if(description.length>3000)return send(res,400,{error:"Opis może mieć maksymalnie 3000 znaków."});
         const javaResult=await buildJavaExport(description,{iconStyle:String(body.iconStyle||"crystal"),colorTheme:String(body.colorTheme||"ice"),recipeMaterial:String(body.recipeMaterial||"minecraft:amethyst_shard")});
         const javaData=fs.readFileSync(javaResult.output); javaResult.cleanup();
         res.writeHead(200,{"Content-Type":javaResult.contentType,"Content-Disposition":`attachment; filename="${javaResult.filename}"`,"Content-Length":javaData.length,"X-Content-Type-Options":"nosniff"});
