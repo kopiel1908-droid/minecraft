@@ -3,7 +3,25 @@ const description = $("description");
 const button = $("export");
 const message = $("message");
 
-function drawIconPreview() {
+
+function syncEditionMode() {
+  const javaMode = $("edition")?.value === "java";
+  const typeField = $("type");
+  if (javaMode) {
+    typeField.value = "java_item";
+    [...typeField.options].forEach(option => { option.disabled = option.value !== "java_item"; });
+    $("blockSettings").hidden = true;
+    button.textContent = "Generuj paczkę Java ↓";
+  } else {
+    [...typeField.options].forEach(option => { option.disabled = option.value === "java_item"; });
+    if (typeField.value === "java_item") typeField.value = "item";
+    $("blockSettings").hidden = typeField.value !== "block";
+    button.textContent = typeField.value === "resource_pack" ? "Generuj paczkę zasobów ↓" : typeField.value === "block" ? "Generuj blok ↓" : typeField.value === "item_set" ? "Generuj zestaw 3 przedmiotów ↓" : "Generuj dodatek ↓";
+  }
+}
+$("edition")?.addEventListener("change", syncEditionMode);
+syncEditionMode();
+\nfunction drawIconPreview() {
   const canvas = $("iconPreview");
   if (!canvas) return;
   const context = canvas.getContext("2d");
@@ -228,7 +246,7 @@ function matchIdeaToSettings() {
   else if (/szmaragd|emerald/.test(idea)) set("recipeMaterial", "minecraft:emerald", "składnik: szmaragd");
 
   $("blockSettings").hidden = $("type").value !== "block";
-  button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : $("type").value === "item_set" ? "Generuj zestaw 3 przedmiotów ↓" : "Generuj dodatek ↓";
+  button.textContent = $("edition")?.value === "java" ? "Generuj paczkę Java ↓" : $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : $("type").value === "item_set" ? "Generuj zestaw 3 przedmiotów ↓" : "Generuj dodatek ↓";
   $("count").textContent = `${description.value.length} / 3000`;
   drawIconPreview();
   const summary = `Dopasowano regułami: ${changes.length ? changes.join(", ") : "podstawowe ustawienia"}. Sprawdź pola i popraw je przed eksportem. To nie jest model AI.`;
@@ -262,12 +280,12 @@ button.addEventListener("click", async () => {
   if (!Number.isFinite(blockFriction) || blockFriction < 0 || blockFriction > 1) { message.textContent = "Tarcie musi wynosić od 0 do 1."; $("blockFriction").focus(); return; }
   button.disabled = true;
   button.textContent = "Tworzę paczkę…";
-  message.textContent = "Generuję pliki Minecraft Bedrock…";
+  message.textContent = $("edition")?.value === "java" ? "Generuję datapack i resource pack dla Minecraft Java 1.20.4…" : "Generuję pliki Minecraft Bedrock…";
   try {
-    const response = await fetch("/api/export", {
+    const exportType = $("edition")?.value === "java" ? "java_item" : $("type").value;\n    const response = await fetch("/api/export", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: value, type: $("type").value, damage: Number($("damage").value), stackSize: Number($("stackSize").value), durability: Number($("durability").value), rarity: $("rarity").value, glint: $("glint").checked, recipeMaterial: $("recipeMaterial").value, recipeTool: $("recipeTool").value, recipeType: $("recipeType").value, recipeCount: Number($("recipeCount").value), itemCategory: $("itemCategory").value, handEquipped: $("handEquipped").checked, iconStyle: $("iconStyle").value, colorTheme: $("colorTheme").value, blockHardness: Number($("blockHardness").value), explosionResistance: Number($("explosionResistance").value), blockLight: Number($("blockLight").value), blockFriction: Number($("blockFriction").value), blockSound, blockTextureStyle, itemEffect: $("itemEffect").value, effectDuration: Number($("effectDuration").value), effectAmplifier: Number($("effectAmplifier").value), cooldownSeconds: Number($("cooldownSeconds").value), enchantability: Number($("enchantability").value), enchantSlot: $("enchantSlot").value, useAnimation: $("useAnimation").value })
+      body: JSON.stringify({ description: value, type: exportType, damage: Number($("damage").value), stackSize: Number($("stackSize").value), durability: Number($("durability").value), rarity: $("rarity").value, glint: $("glint").checked, recipeMaterial: $("recipeMaterial").value, recipeTool: $("recipeTool").value, recipeType: $("recipeType").value, recipeCount: Number($("recipeCount").value), itemCategory: $("itemCategory").value, handEquipped: $("handEquipped").checked, iconStyle: $("iconStyle").value, colorTheme: $("colorTheme").value, blockHardness: Number($("blockHardness").value), explosionResistance: Number($("explosionResistance").value), blockLight: Number($("blockLight").value), blockFriction: Number($("blockFriction").value), blockSound, blockTextureStyle, itemEffect: $("itemEffect").value, effectDuration: Number($("effectDuration").value), effectAmplifier: Number($("effectAmplifier").value), cooldownSeconds: Number($("cooldownSeconds").value), enchantability: Number($("enchantability").value), enchantSlot: $("enchantSlot").value, useAnimation: $("useAnimation").value })
     });
     if (!response.ok) {
       let error = {};
@@ -286,7 +304,7 @@ button.addEventListener("click", async () => {
     anchor.click();
     anchor.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1500);
-    message.textContent = `Gotowe: ${filename}. To wczesny prototyp; sprawdź paczkę w swojej wersji Minecraft Bedrock.`;
+    message.textContent = $("edition")?.value === "java" ? `Gotowe: ${filename}. Rozpakuj ZIP i skopiuj datapack oraz resource pack zgodnie z plikiem INSTALACJA.txt.` : `Gotowe: ${filename}. To wczesny prototyp; sprawdź paczkę w swojej wersji Minecraft Bedrock.`;
   } catch (error) {
     message.textContent = error.message || "Nieznany błąd.";
   } finally {
