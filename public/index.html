@@ -4,27 +4,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b0d10">
-  <title>AI Addon Studio 0.4.35</title>
+  <title>AI Addon Studio 0.5.0</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <main class="shell">
     <header>
       <div class="logo">A</div>
-      <div><p class="eyebrow">MINECRAFT BEDROCK • CREATOR TOOL</p><h1>AI Addon Studio</h1><p class="sub">Od pomysłu do pierwszej działającej paczki.</p></div>
+      <div><p class="eyebrow">MINECRAFT BEDROCK + JAVA • CREATOR TOOL</p><h1>AI Addon Studio</h1><p class="sub">Od pomysłu do pierwszej działającej paczki.</p></div>
       <span class="status"><span class="dot"></span> lokalnie</span>
     </header>
     <section class="hero">
-      <span class="tag">WERSJA 0.4.35</span>
+      <span class="tag">WERSJA 0.5.0</span>
       <h2>Twój pomysł.<br><em>Twój dodatek.</em></h2>
-      <p>Generator tworzy paczki zasobów, przedmioty z efektami po użyciu i eksperymentalne bloki do Minecraft Bedrock. Tryb zestawu przygotowuje trzy warianty przedmiotu w jednym pliku .mcaddon. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
+      <p>Generator obsługuje Minecraft Bedrock oraz Minecraft Java. Dla Java tworzy paczkę datapack + resource pack, bez instalowania loadera modów. Tryb zestawu przygotowuje trzy warianty przedmiotu w jednym pliku .mcaddon. To generator regułowy, jeszcze bez połączenia z modelem AI.</p>
     </section>
     <section class="panel">
       <p class="eyebrow">01 / KONCEPCJA</p>
       <h3>Co tworzymy?</h3>
-      <label for="type">Rodzaj projektu</label>
+      <label for="edition">Edycja Minecrafta</label>\n      <select id="edition"><option value="bedrock">Minecraft Bedrock</option><option value="java">Minecraft Java Edition (datapack + resource pack)</option></select>\n      <label for="type">Rodzaj projektu</label>
       <select id="type">
-        <option value="item">Własny przedmiot / broń (prototyp)</option>
+        <option value="item">Własny przedmiot / broń (Bedrock)</option>\n        <option value="java_item">Własny przedmiot (Java 1.20.4)</option>
         <option value="item_set">Zestaw 3 powiązanych przedmiotów</option>
         <option value="resource_pack">Paczka zasobów</option>
         <option value="universal">Uniwersalny dodatek (prototyp przedmiotu)</option>
@@ -168,7 +168,7 @@
         <option value="4">4 sztuki</option>
       </select>
       <div class="foot"><span id="count">0 / 3000</span><button id="export">Generuj dodatek ↓</button></div>
-      <p class="hint">Przedmiot: plik .mcaddon zawierający Behavior Pack i Resource Pack. Paczka zasobów: .mcpack. Własny model 3D i generowanie AI nie są jeszcze dostępne. Bloki to wczesny prototyp.</p>
+      <p class="hint">Bedrock: .mcaddon / .mcpack. Java: .zip z datapackiem i resource packiem (Minecraft 1.20.4). Paczka zasobów: .mcpack. Własny model 3D i generowanie AI nie są jeszcze dostępne. Bloki to wczesny prototyp.</p>
       <p id="message" role="status" aria-live="polite"></p>
     </section>
     <section class="panel details">
@@ -181,7 +181,7 @@
         <li>Do wyboru są cztery style ikony: miecz, kryształ, magiczna kula i runiczny talizman oraz pięć palet kolorów. Można też wybrać drugi składnik receptury. Bloki są eksperymentalne; mobów, pojazdów i map jeszcze nie generuje.</li>
       </ul>
     </section>
-    <footer>AI Addon Studio • Minecraft Bedrock • wersja eksperymentalna</footer>
+    <footer>AI Addon Studio • Minecraft Bedrock + Java Edition • wersja eksperymentalna</footer>
   </main>
   <script src="/app.js"></script>
 </body>
