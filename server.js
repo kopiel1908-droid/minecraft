@@ -433,7 +433,13 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
-      const body=await readBody(req),description=String(body.description||"").trim(),type=String(body.type||"universal");\n      if(type==="java_item"){\n        const javaResult=await buildJavaExport(description,{iconStyle:String(body.iconStyle||"crystal"),colorTheme:String(body.colorTheme||"ice"),recipeMaterial:String(body.recipeMaterial||"minecraft:amethyst_shard")});\n        const javaData=fs.readFileSync(javaResult.output); javaResult.cleanup();\n        res.writeHead(200,{"Content-Type":javaResult.contentType,"Content-Disposition":`attachment; filename="${javaResult.filename}"`,"Content-Length":javaData.length,"X-Content-Type-Options":"nosniff"});\n        return res.end(javaData);\n      }
+      const body=await readBody(req),description=String(body.description||"").trim(),type=String(body.type||"universal");
+      if(type==="java_item"){
+        const javaResult=await buildJavaExport(description,{iconStyle:String(body.iconStyle||"crystal"),colorTheme:String(body.colorTheme||"ice"),recipeMaterial:String(body.recipeMaterial||"minecraft:amethyst_shard")});
+        const javaData=fs.readFileSync(javaResult.output); javaResult.cleanup();
+        res.writeHead(200,{"Content-Type":javaResult.contentType,"Content-Disposition":`attachment; filename="${javaResult.filename}"`,"Content-Length":javaData.length,"X-Content-Type-Options":"nosniff"});
+        return res.end(javaData);
+      }
       if(description.length<5)return send(res,400,{error:"Wpisz opis (minimum 5 znaków)."});
       if(description.length>3000)return send(res,400,{error:"Opis może mieć maksymalnie 3000 znaków."});
       if(!new Set(["resource_pack","item","item_set","universal","block"]).has(type))return send(res,400,{error:"Ten rodzaj dodatku jest jeszcze w przygotowaniu. Działają przedmioty, bloki i paczki zasobów."});
