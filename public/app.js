@@ -283,7 +283,8 @@ button.addEventListener("click", async () => {
   button.textContent = "Tworzę paczkę…";
   message.textContent = $("edition")?.value === "java" ? "Generuję datapack i resource pack dla Minecraft Java 1.20.4…" : "Generuję pliki Minecraft Bedrock…";
   try {
-    const exportType = $("edition")?.value === "java" ? "java_item" : $("type").value;\n    const response = await fetch("/api/export", {
+    const exportType = $("edition")?.value === "java" ? "java_item" : $("type").value;
+    const response = await fetch("/api/export", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ description: value, type: exportType, damage: Number($("damage").value), stackSize: Number($("stackSize").value), durability: Number($("durability").value), rarity: $("rarity").value, glint: $("glint").checked, recipeMaterial: $("recipeMaterial").value, recipeTool: $("recipeTool").value, recipeType: $("recipeType").value, recipeCount: Number($("recipeCount").value), itemCategory: $("itemCategory").value, handEquipped: $("handEquipped").checked, iconStyle: $("iconStyle").value, colorTheme: $("colorTheme").value, blockHardness: Number($("blockHardness").value), explosionResistance: Number($("explosionResistance").value), blockLight: Number($("blockLight").value), blockFriction: Number($("blockFriction").value), blockSound, blockTextureStyle, itemEffect: $("itemEffect").value, effectDuration: Number($("effectDuration").value), effectAmplifier: Number($("effectAmplifier").value), cooldownSeconds: Number($("cooldownSeconds").value), enchantability: Number($("enchantability").value), enchantSlot: $("enchantSlot").value, useAnimation: $("useAnimation").value })
