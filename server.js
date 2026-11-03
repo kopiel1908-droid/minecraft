@@ -364,12 +364,7 @@ function createJavaPack(root, packName, itemId, itemName, description, options={
   const safeText=JSON.stringify({text:itemName,color:"aqua",italic:false});
   const giveCommand=`give @s ${baseItem}{CustomModelData:${modelId},display:{Name:'${safeText}'},studio_item:"${itemId}"} 1`;
   fs.mkdirSync(path.join(dataRoot,"data",namespace,"functions"),{recursive:true});
-  fs.writeFileSync(path.join(dataRoot,"data",namespace,"functions","give_"+itemId+".mcfunction"),giveCommand+"\\n");
-  writeJson(path.join(dataRoot,"data",namespace,"recipes",itemId+".json"),{
-    type:"minecraft:crafting_shapeless",
-    ingredients:[{item:options.recipeMaterial||"minecraft:amethyst_shard"},{item:"minecraft:stick"}],
-    result:{item:baseItem,count:1}
-  });
+  fs.writeFileSync(path.join(dataRoot,"data",namespace,"functions","give_"+itemId+".mcfunction"),giveCommand+"\n");
   const textureDir=path.join(resourceRoot,"assets",namespace,"textures","item");
   fs.mkdirSync(textureDir,{recursive:true});
   fs.writeFileSync(path.join(textureDir,itemId+".png"),makeIcon(itemId,options.iconStyle||"crystal",options.colorTheme||"ice"));
@@ -384,13 +379,13 @@ function createJavaPack(root, packName, itemId, itemName, description, options={
   fs.mkdirSync(path.join(dataRoot,"data","minecraft","tags","functions"),{recursive:true});
   writeJson(path.join(dataRoot,"data","minecraft","tags","functions","load.json"),{values:[]});
   fs.writeFileSync(path.join(dataRoot,"README.txt"),
-    "Minecraft Java Edition 1.20.4\\n\\n"+
-    "Skopiuj folder datapack do .minecraft/saves/NAZWA_SWIATA/datapacks/.\\n"+
-    "Skopiuj folder resourcepack do .minecraft/resourcepacks/ i wlacz go w ustawieniach gry.\\n"+
-    "W swiecie wpisz: /reload\\n"+
-    "Nastepnie wpisz: /function studio:give_"+itemId+"\\n"+
-    "Przedmiot bazuje na patyku z CustomModelData. To datapack + resource pack, nie mod .jar.\\n");
-  fs.writeFileSync(path.join(resourceRoot,"README.txt"),"Wlacz paczke zasobow w Opcje > Paczki zasobow. Wymaga Minecraft Java 1.20.4.\\n");
+    "Minecraft Java Edition 1.20.4\n\n"+
+    "Skopiuj folder datapack do .minecraft/saves/NAZWA_SWIATA/datapacks/.\n"+
+    "Skopiuj folder resourcepack do .minecraft/resourcepacks/ i wlacz go w ustawieniach gry.\n"+
+    "W swiecie wpisz: /reload\n"+
+    "Nastepnie wpisz: /function studio:give_"+itemId+"\n"+
+    "Przedmiot bazuje na patyku z CustomModelData. To datapack + resource pack, nie mod .jar.\n");
+  fs.writeFileSync(path.join(resourceRoot,"README.txt"),"Wlacz paczke zasobow w Opcje > Paczki zasobow. Wymaga Minecraft Java 1.20.4.\n");
   return {dataRoot,resourceRoot,packId};
 }
 async function buildJavaExport(description, options={}) {
@@ -406,11 +401,11 @@ async function buildJavaExport(description, options={}) {
     fs.cpSync(dataRoot,path.join(bundle,"datapacks",packName),{recursive:true});
     fs.cpSync(resourceRoot,path.join(bundle,"resourcepacks",packName),{recursive:true});
     fs.writeFileSync(path.join(bundle,"INSTALACJA.txt"),
-      "MINECRAFT JAVA EDITION 1.20.4\\n\\n"+
-      "1. Datapack: skopiuj folder z datapacks do .minecraft/saves/NAZWA_SWIATA/datapacks/\\n"+
-      "2. Resource pack: skopiuj folder z resourcepacks do .minecraft/resourcepacks/\\n"+
-      "3. Wlacz paczke zasobow w Opcje > Paczki zasobow.\\n"+
-      "4. W swiecie wykonaj /reload, a potem /function studio:give_"+itemId+"\\n");
+      "MINECRAFT JAVA EDITION 1.20.4\n\n"+
+      "1. Datapack: skopiuj folder z datapacks do .minecraft/saves/NAZWA_SWIATA/datapacks/\n"+
+      "2. Resource pack: skopiuj folder z resourcepacks do .minecraft/resourcepacks/\n"+
+      "3. Wlacz paczke zasobow w Opcje > Paczki zasobow.\n"+
+      "4. W swiecie wykonaj /reload, a potem /function studio:give_"+itemId+"\n");
     await zipDirectory(bundle,output);
     return {output,filename:packName+"-java-1.20.4.zip",contentType:"application/zip",cleanup:()=>{fs.rmSync(root,{recursive:true,force:true});fs.rmSync(output,{force:true});}};
   } catch(error) { fs.rmSync(root,{recursive:true,force:true}); throw error; }
