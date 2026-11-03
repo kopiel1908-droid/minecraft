@@ -1,6 +1,6 @@
-# AI Addon Studio 0.4.35
+# AI Addon Studio 0.5.0
 
-Lokalny prototyp narzędzia do tworzenia paczek Minecraft Bedrock.
+Lokalne narzędzie do tworzenia paczek Minecraft Bedrock oraz prostych dodatków Minecraft Java Edition.
 
 ## Uruchomienie
 
@@ -32,7 +32,7 @@ Następnie otwórz http://localhost:3000.
 - Receptura craftingu z wyborem dwóch składników (patyk, blaze rod, kość lub odłamek ametystu), trybu bez układu albo z układem oraz liczbą otrzymywanych sztuk (1–4).
 - Eksperymentalny blok z czterema wzorami tekstury PNG (kryształ, cegły, ruda, metal), mapowaniem atlasu terenu, definicją `minecraft:block`, ustawianą twardością, odpornością na wybuch i emisją światła (0–15), tarciem powierzchni (0–1) i dźwiękiem (kamień, drewno, szkło, trawa, metal) oraz eksportem `.mcaddon`.
 
-## Ograniczenia
+## Minecraft Java Edition (nowość 0.5.0)\n\n- Wybierz edycję Java w formularzu, aby wyeksportować ZIP zawierający datapack i resource pack.\n- Eksport Java jest obecnie kierowany do Minecraft Java 1.20.4 (pack format datapack 26, resource pack 22).\n- Po instalacji resource packa i datapacka wpisz `/reload`, a następnie `/function studio:give_<id>` w świecie.\n- To rozwiązanie wykorzystuje bazowy patyk z `CustomModelData` i własną teksturę. Nie jest modem `.jar` i nie dodaje nowego typu przedmiotu do rejestru gry.\n\n## Ograniczenia
 
 To nie jest jeszcze generator AI: opis służy głównie jako nazwa, a grafika jest prostym wzorem pixel-art. Własne modele 3D, moby, pojazdy i mapy nie są jeszcze generowane. Zestaw trzech przedmiotów jest generowany według stałych reguł, a nie na podstawie analizy AI. Bloki są eksperymentalnym prototypem i wymagają sprawdzenia w docelowej wersji Bedrock. Zgodność plików trzeba sprawdzić w docelowej wersji Minecraft Bedrock; obsługa może różnić się między platformami.
 
