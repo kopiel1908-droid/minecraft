@@ -415,7 +415,8 @@ async function buildJavaExport(description, options={}) {
     return {output,filename:packName+"-java-1.20.4.zip",contentType:"application/zip",cleanup:()=>{fs.rmSync(root,{recursive:true,force:true});fs.rmSync(output,{force:true});}};
   } catch(error) { fs.rmSync(root,{recursive:true,force:true}); throw error; }
 }
-\nfunction sendStatic(req,res){
+
+function sendStatic(req,res){
   let urlPath;
   try{urlPath=decodeURIComponent(new URL(req.url,`http://${req.headers.host}`).pathname);}catch{return send(res,400,{error:"Nieprawidłowy adres."});}
   let relative=urlPath==="/"?"index.html":urlPath;
