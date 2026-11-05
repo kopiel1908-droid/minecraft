@@ -369,7 +369,7 @@ function createJavaPack(root, packName, itemId, itemName, description, options={
 
   // Java 1.21+ uses the singular "function" directory.
   fs.mkdirSync(path.join(dataRoot,"data",namespace,"function"),{recursive:true});
-  fs.writeFileSync(path.join(dataRoot,"data",namespace,"function","give_"+itemId+".mcfunction"),giveCommand+"\\n");
+  fs.writeFileSync(path.join(dataRoot,"data",namespace,"function","give_"+itemId+".mcfunction"),giveCommand+"\n");
 
   const textureDir=path.join(resourceRoot,"assets",namespace,"textures","item");
   fs.mkdirSync(textureDir,{recursive:true});
@@ -393,13 +393,13 @@ function createJavaPack(root, packName, itemId, itemName, description, options={
   });
 
   fs.writeFileSync(path.join(dataRoot,"README.txt"),
-    "Minecraft Java Edition 26.3\\n\\n"+
-    "Skopiuj folder datapack do .minecraft/saves/NAZWA_SWIATA/datapacks/.\\n"+
-    "Skopiuj folder resourcepack do .minecraft/resourcepacks/ i wlacz go w ustawieniach gry.\\n"+
-    "W swiecie wpisz: /reload\\n"+
-    "Nastepnie wpisz: /function studio:give_"+itemId+"\\n"+
-    "Przedmiot bazuje na patyku z minecraft:custom_model_data. To datapack + resource pack, nie mod .jar.\\n");
-  fs.writeFileSync(path.join(resourceRoot,"README.txt"),"Wlacz paczke zasobow w Opcje > Paczki zasobow. Wymaga Minecraft Java 26.3.\\n");
+    "Minecraft Java Edition 26.3\n\n"+
+    "Skopiuj folder datapack do .minecraft/saves/NAZWA_SWIATA/datapacks/.\n"+
+    "Skopiuj folder resourcepack do .minecraft/resourcepacks/ i wlacz go w ustawieniach gry.\n"+
+    "W swiecie wpisz: /reload\n"+
+    "Nastepnie wpisz: /function studio:give_"+itemId+"\n"+
+    "Przedmiot bazuje na patyku z minecraft:custom_model_data. To datapack + resource pack, nie mod .jar.\n");
+  fs.writeFileSync(path.join(resourceRoot,"README.txt"),"Wlacz paczke zasobow w Opcje > Paczki zasobow. Wymaga Minecraft Java 26.3.\n");
   return {dataRoot,resourceRoot};
 }
 async function buildJavaExport(description, options={}) {
@@ -415,12 +415,12 @@ async function buildJavaExport(description, options={}) {
     fs.cpSync(dataRoot,path.join(bundle,"datapacks",packName),{recursive:true});
     fs.cpSync(resourceRoot,path.join(bundle,"resourcepacks",packName),{recursive:true});
     fs.writeFileSync(path.join(bundle,"INSTALACJA.txt"),
-      "MINECRAFT JAVA EDITION 26.3\\n\\n"+
-      "1. Datapack: skopiuj folder z datapacks do .minecraft/saves/NAZWA_SWIATA/datapacks/\\n"+
-      "2. Resource pack: skopiuj folder z resourcepacks do .minecraft/resourcepacks/\\n"+
-      "3. Wlacz paczke zasobow w Opcje > Paczki zasobow.\\n"+
-      "4. W swiecie wykonaj /reload, a potem /function studio:give_"+itemId+"\\n"+
-      "Wymagane formaty: datapack 121.0, resource pack 97.1.\\n");
+      "MINECRAFT JAVA EDITION 26.3\n\n"+
+      "1. Datapack: skopiuj folder z datapacks do .minecraft/saves/NAZWA_SWIATA/datapacks/\n"+
+      "2. Resource pack: skopiuj folder z resourcepacks do .minecraft/resourcepacks/\n"+
+      "3. Wlacz paczke zasobow w Opcje > Paczki zasobow.\n"+
+      "4. W swiecie wykonaj /reload, a potem /function studio:give_"+itemId+"\n"+
+      "Wymagane formaty: datapack 121.0, resource pack 97.1.\n");
     await zipDirectory(bundle,output);
     return {output,filename:packName+"-java-26.3.zip",contentType:"application/zip",cleanup:()=>{fs.rmSync(root,{recursive:true,force:true});fs.rmSync(output,{force:true});}};
   } catch(error) { fs.rmSync(root,{recursive:true,force:true}); throw error; }
