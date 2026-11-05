@@ -281,7 +281,7 @@ button.addEventListener("click", async () => {
   if (!Number.isFinite(blockFriction) || blockFriction < 0 || blockFriction > 1) { message.textContent = "Tarcie musi wynosić od 0 do 1."; $("blockFriction").focus(); return; }
   button.disabled = true;
   button.textContent = "Tworzę paczkę…";
-  message.textContent = $("edition")?.value === "java" ? "Generuję datapack i resource pack dla Minecraft Java 1.20.4…" : "Generuję pliki Minecraft Bedrock…";
+  message.textContent = $("edition")?.value === "java" ? "Generuję datapack i resource pack dla Minecraft Java 26.3…" : "Generuję pliki Minecraft Bedrock…";
   try {
     const exportType = $("edition")?.value === "java" ? "java_item" : $("type").value;
     const response = await fetch("/api/export", {
@@ -311,7 +311,7 @@ button.addEventListener("click", async () => {
     message.textContent = error.message || "Nieznany błąd.";
   } finally {
     button.disabled = false;
-    button.textContent = $("type").value === "resource_pack" ? "Generuj paczkę zasobów ↓" : $("type").value === "block" ? "Generuj blok ↓" : $("type").value === "item_set" ? "Generuj zestaw 3 przedmiotów ↓" : "Generuj dodatek ↓";
+    syncEditionMode();
   }
 });
 function readProjectConfig() {
