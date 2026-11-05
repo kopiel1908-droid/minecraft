@@ -351,6 +351,81 @@ async function buildExport(description,type,options={}){
     return {output,filename:`${packName}.mcaddon`,contentType:"application/octet-stream",cleanup:()=>{fs.rmSync(root,{recursive:true,force:true});for(const f of temporary)fs.rmSync(f,{force:true});}};
   }catch(error){fs.rmSync(root,{recursive:true,force:true});for(const f of temporary)fs.rmSync(f,{force:true});throw error;}
 }
+
+function createJavaPack(root, packName, itemId, itemName, description, options={}) {
+  const namespace="studio";
+  const dataRoot=path.join(root,"datapack");
+  const resourceRoot=path.join(root,"resourcepack");
+  const packFormatData=121;
+  const packFormatResource=97.1;
+  const modelId=Number(options.javaCustomModelData)||260041;
+  const baseItem="minecraft:stick";
+  const quoteSnbt=value=>JSON.stringify(String(value));
+  const customName=`{text:${quoteSnbt(itemName)},color:"aqua",italic:false}`;
+  const giveCommand=`give @s ${baseItem}[minecraft:custom_model_data={floats:[${modelId}.0]},minecraft:custom_name=${customName}] 1`;
+
+  writeJson(path.join(dataRoot,"pack.mcmeta"),{pack:{pack_format:packFormatData,description:packName+" datapack (Minecraft Java 26.3)"}});
+  writeJson(path.join(resourceRoot,"pack.mcmeta"),{pack:{pack_format:packFormatResource,description:packName+" resource pack (Minecraft Java 26.3)"}});
+
+  // Java 1.21+ uses the singular "function" directory.
+  fs.mkdirSync(path.join(dataRoot,"data",namespace,"function"),{recursive:true});
+  fs.writeFileSync(path.join(dataRoot,"data",namespace,"function","give_"+itemId+".mcfunction"),giveCommand+"\n");
+
+  const textureDir=path.join(resourceRoot,"assets",namespace,"textures","item");
+  fs.mkdirSync(textureDir,{recursive:true});
+  fs.writeFileSync(path.join(textureDir,itemId+".png"),makeIcon(itemId,options.iconStyle||"crystal",options.colorTheme||"ice"));
+
+  const modelDir=path.join(resourceRoot,"assets",namespace,"models","item");
+  fs.mkdirSync(modelDir,{recursive:true});
+  writeJson(path.join(modelDir,itemId+".json"),{parent:"minecraft:item/generated",textures:{layer0:namespace+":item/"+itemId}});
+
+  // Since Java 1.21.4, item model selection is defined in assets/<namespace>/items.
+  const itemDefinitions=path.join(resourceRoot,"assets","minecraft","items");
+  fs.mkdirSync(itemDefinitions,{recursive:true});
+  writeJson(path.join(itemDefinitions,"stick.json"),{
+    model:{
+      type:"minecraft:range_dispatch",
+      property:"minecraft:custom_model_data",
+      index:0,
+      entries:[{threshold:modelId,model:{type:"minecraft:model",model:namespace+":item/"+itemId}}],
+      fallback:{type:"minecraft:model",model:"minecraft:item/stick"}
+    }
+  });
+
+  fs.writeFileSync(path.join(dataRoot,"README.txt"),
+    "Minecraft Java Edition 26.3\n\n"+
+    "Skopiuj folder datapack do .minecraft/saves/NAZWA_SWIATA/datapacks/.\n"+
+    "Skopiuj folder resourcepack do .minecraft/resourcepacks/ i wlacz go w ustawieniach gry.\n"+
+    "W swiecie wpisz: /reload\n"+
+    "Nastepnie wpisz: /function studio:give_"+itemId+"\n"+
+    "Przedmiot bazuje na patyku z minecraft:custom_model_data. To datapack + resource pack, nie mod .jar.\n");
+  fs.writeFileSync(path.join(resourceRoot,"README.txt"),"Wlacz paczke zasobow w Opcje > Paczki zasobow. Wymaga Minecraft Java 26.3.\n");
+  return {dataRoot,resourceRoot};
+}
+async function buildJavaExport(description, options={}) {
+  const itemName=displayName(description), itemId=safeName(itemName).slice(0,28)||"custom_item";
+  const packName=safeName(itemName), root=path.join(os.tmpdir(),"java-addon-"+randomUUID());
+  fs.mkdirSync(root,{recursive:true});
+  try {
+    const {dataRoot,resourceRoot}=createJavaPack(root,packName,itemId,itemName,description,options);
+    const output=path.join(os.tmpdir(),packName+"-java-"+randomUUID()+".zip");
+    const bundle=path.join(root,"AI-Addon-Studio-Java");
+    fs.mkdirSync(path.join(bundle,"datapacks",packName),{recursive:true});
+    fs.mkdirSync(path.join(bundle,"resourcepacks",packName),{recursive:true});
+    fs.cpSync(dataRoot,path.join(bundle,"datapacks",packName),{recursive:true});
+    fs.cpSync(resourceRoot,path.join(bundle,"resourcepacks",packName),{recursive:true});
+    fs.writeFileSync(path.join(bundle,"INSTALACJA.txt"),
+      "MINECRAFT JAVA EDITION 26.3\n\n"+
+      "1. Datapack: skopiuj folder z datapacks do .minecraft/saves/NAZWA_SWIATA/datapacks/\n"+
+      "2. Resource pack: skopiuj folder z resourcepacks do .minecraft/resourcepacks/\n"+
+      "3. Wlacz paczke zasobow w Opcje > Paczki zasobow.\n"+
+      "4. W swiecie wykonaj /reload, a potem /function studio:give_"+itemId+"\n"+
+      "Wymagane formaty: datapack 121.0, resource pack 97.1.\n");
+    await zipDirectory(bundle,output);
+    return {output,filename:packName+"-java-26.3.zip",contentType:"application/zip",cleanup:()=>{fs.rmSync(root,{recursive:true,force:true});fs.rmSync(output,{force:true});}};
+  } catch(error) { fs.rmSync(root,{recursive:true,force:true}); throw error; }
+}
+
 function sendStatic(req,res){
   let urlPath;
   try{urlPath=decodeURIComponent(new URL(req.url,`http://${req.headers.host}`).pathname);}catch{return send(res,400,{error:"Nieprawidłowy adres."});}
@@ -364,11 +439,19 @@ function sendStatic(req,res){
   });
 }
 const server=http.createServer(async(req,res)=>{
-  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.4.35",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,supportedTypes:["item","item_set","resource_pack","universal","block"]});
+  if(req.method==="GET"&&req.url==="/api/status")return send(res,200,{ok:true,app:"AI Addon Studio",version:"0.6.0",node:process.version,aiConnected:false,mcpackExport:true,mcaddonExport:true,javaExport:true,supportedEditions:["bedrock","java"],supportedTypes:["item","item_set","resource_pack","universal","block","java_item"]});
   if(req.method==="POST"&&req.url==="/api/export"){
     let result;
     try{
       const body=await readBody(req),description=String(body.description||"").trim(),type=String(body.type||"universal");
+      if(type==="java_item"){
+        if(description.length<5)return send(res,400,{error:"Wpisz opis (minimum 5 znaków)."});
+        if(description.length>3000)return send(res,400,{error:"Opis może mieć maksymalnie 3000 znaków."});
+        const javaResult=await buildJavaExport(description,{iconStyle:String(body.iconStyle||"crystal"),colorTheme:String(body.colorTheme||"ice"),recipeMaterial:String(body.recipeMaterial||"minecraft:amethyst_shard")});
+        const javaData=fs.readFileSync(javaResult.output); javaResult.cleanup();
+        res.writeHead(200,{"Content-Type":javaResult.contentType,"Content-Disposition":`attachment; filename="${javaResult.filename}"`,"Content-Length":javaData.length,"X-Content-Type-Options":"nosniff"});
+        return res.end(javaData);
+      }
       if(description.length<5)return send(res,400,{error:"Wpisz opis (minimum 5 znaków)."});
       if(description.length>3000)return send(res,400,{error:"Opis może mieć maksymalnie 3000 znaków."});
       if(!new Set(["resource_pack","item","item_set","universal","block"]).has(type))return send(res,400,{error:"Ten rodzaj dodatku jest jeszcze w przygotowaniu. Działają przedmioty, bloki i paczki zasobów."});

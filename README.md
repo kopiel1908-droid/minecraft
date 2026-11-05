@@ -1,6 +1,6 @@
-# AI Addon Studio 0.4.35
+# AI Addon Studio 0.6.0
 
-Lokalny prototyp narzędzia do tworzenia paczek Minecraft Bedrock.
+Lokalne narzędzie do tworzenia paczek Minecraft Bedrock oraz prostych dodatków Minecraft Java Edition.
 
 ## Uruchomienie
 
@@ -31,6 +31,13 @@ Następnie otwórz http://localhost:3000.
 - Ustawiane obrażenia (1–20), trwałość (0–1000; 0 wyłącza komponent), rzadkość, magiczny połysk, wielkość stosu (1–64), kategoria ekwipunku i sposób wyświetlania przedmiotu w dłoni.
 - Receptura craftingu z wyborem dwóch składników (patyk, blaze rod, kość lub odłamek ametystu), trybu bez układu albo z układem oraz liczbą otrzymywanych sztuk (1–4).
 - Eksperymentalny blok z czterema wzorami tekstury PNG (kryształ, cegły, ruda, metal), mapowaniem atlasu terenu, definicją `minecraft:block`, ustawianą twardością, odpornością na wybuch i emisją światła (0–15), tarciem powierzchni (0–1) i dźwiękiem (kamień, drewno, szkło, trawa, metal) oraz eksportem `.mcaddon`.
+
+## Minecraft Java Edition (nowość 0.6.0)
+
+- Wybierz edycję Java w formularzu, aby wyeksportować ZIP zawierający datapack i resource pack.
+- Eksport Java jest obecnie kierowany do Minecraft Java 26.3 (pack format datapack 121.0, resource pack 97.1).
+- Po instalacji resource packa i datapacka wpisz `/reload`, a następnie `/function studio:give_<id>` w świecie.
+- To rozwiązanie wykorzystuje bazowy patyk z `CustomModelData` i własną teksturę. Nie jest modem `.jar` i nie dodaje nowego typu przedmiotu do rejestru gry.
 
 ## Ograniczenia
 

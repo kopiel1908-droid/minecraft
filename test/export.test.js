@@ -455,4 +455,39 @@ test("AI Addon Studio smoke tests", async (t) => {
     assert.ok(recipe.ingredients.some(ingredient => ingredient.item === "minecraft:iron_ingot"));
   });
 
+  await t.test("exports a Minecraft Java 26.3 datapack and resource pack", async () => {
+    const response = await fetch(`${baseUrl}/api/export`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description: "Miecz testowy Java", type: "java_item", iconStyle: "crystal", colorTheme: "ice" })
+    });
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get("content-disposition") || "", /java-26\.3\.zip/i);
+
+    const bundle = readZipEntries(Buffer.from(await response.arrayBuffer()));
+    const datapackMetaPath = [...bundle.keys()].find(name => name.includes("/datapacks/") && name.endsWith("/pack.mcmeta"));
+    const resourceMetaPath = [...bundle.keys()].find(name => name.includes("/resourcepacks/") && name.endsWith("/pack.mcmeta"));
+    assert.ok(datapackMetaPath);
+    assert.ok(resourceMetaPath);
+    assert.equal(JSON.parse(bundle.get(datapackMetaPath).toString("utf8")).pack.pack_format, 121);
+    assert.equal(JSON.parse(bundle.get(resourceMetaPath).toString("utf8")).pack.pack_format, 97.1);
+
+    const functionPath = [...bundle.keys()].find(name => name.endsWith("/data/studio/function/give_miecz_testowy_java.mcfunction"));
+    assert.ok(functionPath);
+    const command = bundle.get(functionPath).toString("utf8");
+    assert.match(command, /minecraft:custom_model_data=\{floats:\[260041\.0\]\}/);
+    assert.match(command, /minecraft:custom_name=\{text:"Miecz testowy Java"/);
+
+    const itemDefinitionPath = [...bundle.keys()].find(name => name.endsWith("/assets/minecraft/items/stick.json"));
+    assert.ok(itemDefinitionPath);
+    const itemDefinition = JSON.parse(bundle.get(itemDefinitionPath).toString("utf8"));
+    assert.equal(itemDefinition.model.type, "minecraft:range_dispatch");
+    assert.equal(itemDefinition.model.property, "minecraft:custom_model_data");
+    assert.equal(itemDefinition.model.entries[0].threshold, 260041);
+
+    const texturePath = [...bundle.keys()].find(name => name.endsWith("/assets/studio/textures/item/miecz_testowy_java.png"));
+    assert.ok(texturePath);
+    assert.equal(bundle.get(texturePath).subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
+  });
+
 });
