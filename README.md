@@ -1,4 +1,4 @@
-# AI Addon Studio 0.5.0
+# AI Addon Studio 0.6.0
 
 Lokalne narzędzie do tworzenia paczek Minecraft Bedrock oraz prostych dodatków Minecraft Java Edition.
 
@@ -35,7 +35,7 @@ Następnie otwórz http://localhost:3000.
 ## Minecraft Java Edition (nowość 0.5.0)
 
 - Wybierz edycję Java w formularzu, aby wyeksportować ZIP zawierający datapack i resource pack.
-- Eksport Java jest obecnie kierowany do Minecraft Java 1.20.4 (pack format datapack 26, resource pack 22).
+- Eksport Java jest obecnie kierowany do Minecraft Java 26.3 (pack format datapack 121.0, resource pack 97.1).
 - Po instalacji resource packa i datapacka wpisz `/reload`, a następnie `/function studio:give_<id>` w świecie.
 - To rozwiązanie wykorzystuje bazowy patyk z `CustomModelData` i własną teksturę. Nie jest modem `.jar` i nie dodaje nowego typu przedmiotu do rejestru gry.
 
